@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{# Temporary home page. Suhaib's media_portal homepage replaces it. #}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "What's here" "" %}
+      <ul class="roster">
+        <li><span class="roster__dot is-ready"></span><span class="roster__name">Repository<span class="roster__duty">Notes, slides and lecture videos by subject and unit.</span></span><span class="tag">soon</span></li>
+        <li><span class="roster__dot is-ready"></span><span class="roster__name">Ask<span class="roster__duty">Questions answered from the repository, with sources.</span></span><span class="tag">soon</span></li>
+        <li><span class="roster__dot is-ready"></span><span class="roster__name">Outreach<span class="roster__duty">Quizzes, articles and translations made from every upload.</span></span><span class="tag">soon</span></li>
+        <li><span class="roster__dot is-ready"></span><span class="roster__name">Media<span class="roster__duty">News, events and announcements.</span></span><span class="tag">soon</span></li>
+      </ul>
+    </section>
+  </aside>
+
+  <div class="split__main">
+    <section>
+      <p class="label label--accent">Smart Education · 2026–27</p>
+      <h2 class="display">Learn from one shared library.<br><em>Share it with everyone.</em></h2>
+      <p class="muted" style="max-width: 60ch; margin-top: 18px;">Teachers upload a lesson once. Students find it, ask questions about it, and test themselves on it, in English, Hindi, Marathi and Konkani.</p>
+    </section>
+  </div>
+</div>
+{% endblock %}

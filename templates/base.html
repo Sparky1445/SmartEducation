@@ -1,0 +1,55 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Smart Education{% endblock %} · Smart Education</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/smartedu.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div>
+      <h1 class="masthead__title"><a href="{% url 'home' %}">Smart Education<span class="masthead__dot">.</span></a></h1>
+      <p class="masthead__lede">{% block lede %}A knowledge repository and outreach portal for students, teachers and the community.{% endblock %}</p>
+    </div>
+    <div class="masthead__meta">
+      <div>repository · outreach · media</div>
+      <div>learn · ask · share</div>
+    </div>
+  </header>
+
+  {% block nav %}
+  <nav class="nav" aria-label="Main">
+    {% with section=request.resolver_match.app_name %}
+    <span class="is-soon" title="Coming soon">Repository</span>
+    <span class="is-soon" title="Coming soon">Ask</span>
+    <span class="is-soon" title="Coming soon">Outreach studio</span>
+    <span class="is-soon" title="Coming soon">Media</span>
+    <span class="nav__spacer"></span>
+    {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin</a>{% endif %}
+    {% endwith %}
+  </nav>
+  {% endblock %}
+
+  {% if messages %}
+  <ul class="flash">
+    {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <main>{% block content %}{% endblock %}</main>
+
+  <footer class="footer">
+    <span>Smart Education · INT253 · 2026–27</span>
+    <span>{% block footer_meta %}Dhargal · North Goa{% endblock %}</span>
+  </footer>
+</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>
