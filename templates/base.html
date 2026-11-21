@@ -28,7 +28,7 @@
   <nav class="nav" aria-label="Main">
     {% with section=request.resolver_match.app_name %}
     <span class="is-soon" title="Coming soon">Repository</span>
-    <span class="is-soon" title="Coming soon">Ask</span>
+    <a href="{% url 'ask:home' %}" class="{% if section == 'ask' %}is-active{% endif %}">Ask</a>
     <span class="is-soon" title="Coming soon">Outreach studio</span>
     <span class="is-soon" title="Coming soon">Media</span>
     <span class="nav__spacer"></span>

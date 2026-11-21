@@ -27,6 +27,31 @@ def run_sync(coro: Awaitable[T]) -> T:
         return pool.submit(asyncio.run, coro).result()
 
 
+class EventLoop:
+    """One event loop reused for several async steps of a pipeline.
+
+    Pipelines alternate async agent calls with sync Django ORM work (search,
+    reading sources). Running every step on the same loop keeps the HTTP
+    clients of live providers valid between steps.
+
+        with EventLoop() as loop:
+            reply = loop.run(agent.get_response(messages=...))
+    """
+
+    def __enter__(self) -> "EventLoop":
+        self._loop = asyncio.new_event_loop()
+        return self
+
+    def run(self, coro: Awaitable[T]) -> T:
+        return self._loop.run_until_complete(coro)
+
+    def __exit__(self, *exc) -> None:
+        try:
+            self._loop.run_until_complete(self._loop.shutdown_asyncgens())
+        finally:
+            self._loop.close()
+
+
 class RunRecorder:
     """Collects the steps of one run; saved into AgentRun.trace."""
 

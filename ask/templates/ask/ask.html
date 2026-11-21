@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load ui ask_tags humanize %}
+
+{% block title %}Ask{% endblock %}
+{% block lede %}Ask anything about the lessons in the repository. Every answer comes only from material our teachers have uploaded, and shows exactly where it came from.{% endblock %}
+
+{% block content %}
+<div class="split">
+
+  <aside class="split__aside">
+    <section>
+      {% section_head "Your questions" "this device" %}
+      {% if history %}
+        <ol class="qlist">
+          {% for item in history %}
+          <li class="{% if current and item.pk == current.pk %}is-current{% endif %}">
+            <a href="?q={{ item.pk }}#answer">{{ item.question|truncatechars:70 }}</a>
+            <span class="qlist__meta">{% if item.in_repository %}{{ item.source_count }} source{{ item.source_count|pluralize }}{% else %}not found{% endif %} · {{ item.created_at|naturaltime }}</span>
+          </li>
+          {% endfor %}
+        </ol>
+        <form method="post" action="{% url 'ask:clear_history' %}" style="margin-top: 14px;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn--quiet">Clear history</button>
+        </form>
+      {% else %}
+        <p class="muted small">Questions you ask appear here, so you can come back to an answer later. They are kept on this device only.</p>
+      {% endif %}
+    </section>
+
+    <section>
+      {% section_head "Good to know" "" %}
+      <p class="note">Answers quote the repository, never the open internet. If a topic is missing, we pass your question to the teachers so they can add a lesson on it.</p>
+    </section>
+  </aside>
+
+  <div class="split__main">
+    <section>
+      <form method="post" class="field" novalidate>
+        {% csrf_token %}
+        <label for="{{ form.question.id_for_label }}" class="label">Ask the repository</label>
+        <div class="field__row">
+          {{ form.question }}
+          <button type="submit" class="btn btn--primary btn--run" data-busy-label="Searching…">Ask</button>
+        </div>
+        {% for error in form.question.errors %}<p class="field__error">{{ error }}</p>{% endfor %}
+      </form>
+      <div class="chips">
+        {% for e in examples %}<button type="button" class="chip" data-fill="{{ e }}">{{ e }}</button>{% endfor %}
+      </div>
+    </section>
+
+    {% if current %}
+    <section id="answer" class="answer">
+      <p class="answer__question">{{ current.question }}</p>
+
+      {% if current.in_repository %}
+        <div class="answer__body">{{ current.answer|cite_marks }}</div>
+
+        <div class="match">
+          <div class="match__row">
+            <span class="label">Source match</span>
+            <span class="label label--accent">{{ current.trust_score }} / 100 · {{ current.trust_score|match_label }}</span>
+          </div>
+          <div class="match__bar"><div class="match__fill" style="width: {{ current.trust_score }}%"></div></div>
+        </div>
+
+        {% section_head "Sources" current.source_count|stringformat:"d"|add:" cited" %}
+        <ol class="sources">
+          {% for c in current.citations %}
+          <li id="src-{{ c.n }}">
+            <span class="sources__n">{{ c.n }}</span>
+            <div>
+              <div class="sources__title">
+                {% if c.url %}<a href="{{ c.url }}">{{ c.title }}</a>{% else %}{{ c.title }}{% endif %}
+                {% if c.locator %}<span class="sources__loc">{{ c.locator }}</span>{% endif %}
+              </div>
+              <p class="sources__excerpt">“{{ c.excerpt }}…”</p>
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <div class="answer__missing">
+          <p class="label label--accent">Not in the repository yet</p>
+          <p>{{ current.answer }}</p>
+        </div>
+      {% endif %}
+
+      <div class="answer__foot">
+        {% if current.helpful is None %}
+          <form method="post" action="{% url 'ask:feedback' current.pk %}" class="inline-form">
+            {% csrf_token %}
+            <span class="label">Was this useful?</span>
+            <button name="helpful" value="yes" class="chip">Yes</button>
+            <button name="helpful" value="no" class="chip">No</button>
+          </form>
+        {% else %}
+          <span class="label">Thanks for the feedback · marked {{ current.helpful|yesno:"useful,not useful" }}</span>
+        {% endif %}
+        <span class="label">asked {{ current.created_at|naturaltime }}</span>
+      </div>
+    </section>
+    {% else %}
+    <section class="answer answer--empty">
+      <p class="display">Ask a question.<br><em>Get the page it came from.</em></p>
+    </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll("[data-fill]").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var input = document.getElementById("{{ form.question.id_for_label }}");
+      input.value = chip.dataset.fill; input.focus();
+    });
+  });
+  document.querySelector("form.field").addEventListener("submit", function (e) {
+    var btn = e.target.querySelector("[data-busy-label]");
+    btn.textContent = btn.dataset.busyLabel; btn.disabled = true;
+  });
+</script>
+{% endblock %}

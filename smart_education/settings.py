@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # --- Atharwa ---
     "core",
     "ai_engine",  # internal only: no public pages
+    "ask",
     # --- Suhaib (add as each app lands) ---
     # "accounts",
     # "repository",
@@ -127,6 +128,9 @@ AI_ENGINE = {
     "AZURE_API_VERSION": os.getenv("AZURE_API_VERSION", "2024-10-21"),
     "TIMEOUT_SECONDS": int(os.getenv("AI_TIMEOUT_SECONDS", "45")),
 }
+
+# Answers whose source match is below this are replaced by "not in the repository".
+ASK_TRUST_THRESHOLD = int(os.getenv("ASK_TRUST_THRESHOLD", "55"))
 
 # --- Logging (Unit III: debugging) -------------------------------------------
 LOG_DIR = BASE_DIR / "logs"

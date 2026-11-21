@@ -188,3 +188,46 @@ input, button, textarea, select { font-family: inherit; }
 .flash { list-style: none; margin: 20px 0 0; padding: 0; }
 .flash li { padding: 10px 13px; border-left: 2px solid var(--accent); background: var(--panel); font-size: 13px; margin-bottom: 8px; }
 .flash li.error { background: var(--accent-wash); color: var(--accent-deep); font-family: var(--mono); font-size: 12px; }
+
+/* ---------- Quiet button, inline forms ---------- */
+.btn--quiet { border-color: var(--rule); color: var(--muted); padding: 7px 14px; font-size: 11px; }
+.btn--quiet:hover { border-color: var(--ink); }
+.inline-form { display: inline-flex; align-items: center; gap: 8px; margin: 0; }
+.inline-form .chip { padding: 3px 12px; }
+
+/* ---------- Numbered question list ---------- */
+.qlist { list-style: none; margin: 0; padding: 0; counter-reset: q; }
+.qlist li { counter-increment: q; display: grid; grid-template-columns: 26px 1fr; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 13.5px; line-height: 1.4; }
+.qlist li::before { content: counter(q, decimal-leading-zero); grid-row: span 2; font-family: var(--mono); font-size: 10.5px; color: var(--faint); padding-top: 3px; }
+.qlist a { color: var(--ink); }
+.qlist li.is-current a { color: var(--accent); }
+.qlist__meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; color: var(--muted); margin-top: 3px; }
+
+/* ---------- Answer ---------- */
+.answer { animation: stepIn .3s ease both; }
+.answer__question { font-family: var(--serif); font-size: 34px; line-height: 1.1; margin: 0 0 18px; }
+.answer__body { font-size: 17px; line-height: 1.7; max-width: 68ch; }
+.answer__missing { border-left: 2px solid var(--accent); background: var(--accent-wash); padding: 14px 16px; max-width: 68ch; }
+.answer__missing p { margin: 0; }
+.answer__missing p + p { margin-top: 6px; color: var(--accent-deep); }
+.answer__foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 26px; padding-top: 12px; border-top: 1px solid var(--rule); }
+.answer--empty { padding: 40px 0; border-top: 1px solid var(--rule); }
+.answer--empty .display { color: var(--muted); }
+.answer--empty em { color: var(--accent); }
+sup.cite { font-family: var(--mono); font-size: 10px; margin-left: 1px; }
+sup.cite a { display: inline-block; min-width: 15px; padding: 0 3px; text-align: center; border: 1px solid var(--accent); color: var(--accent); line-height: 1.35; }
+sup.cite a:hover { background: var(--accent); color: var(--paper); text-decoration: none; }
+
+.match { margin: 24px 0 30px; max-width: 420px; }
+.match__row { display: flex; justify-content: space-between; }
+.match__bar { height: 4px; background: var(--rule); margin-top: 8px; }
+.match__fill { height: 100%; background: var(--accent); }
+
+/* ---------- Sources ---------- */
+.sources { list-style: none; margin: 0; padding: 0; }
+.sources li { display: grid; grid-template-columns: 34px 1fr; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.sources li:target { background: var(--paper-raised); }
+.sources__n { font-family: var(--serif); font-size: 26px; line-height: 1; color: var(--accent); }
+.sources__title { font-weight: 500; }
+.sources__loc { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-left: 8px; }
+.sources__excerpt { margin: 6px 0 0; padding: 9px 12px; background: var(--panel); font-size: 13px; color: var(--ink-soft); line-height: 1.55; }

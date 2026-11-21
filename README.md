@@ -50,10 +50,27 @@ Portal code calls only `ai_engine/services.py`. Pages show results only (answers
 | Function | Returns | Live from |
 | --- | --- | --- |
 | `ping(message, user=None)` | `AgentRun` | Module 1 |
+| `index_source(obj, path=None, text=None)` | number of chunks indexed | Module 2 |
+| `remove_source(obj)` | `None` | Module 2 |
 | `ask(question, user=None)` | `{answer, citations, trust_score, in_repository, run_id}` | Module 2 |
 | `build_outreach_kit(resource_id)` | kit id | Module 3 |
 | `kit_status(kit_id)` | `queued / running / review / published / failed` | Module 3 |
 | `suggest_next_resources(user)` | list of resource ids | Module 4 |
 
 Until a function goes live it returns sample data of the final shape.
-# SmartEducation
+
+## Ask the Repository (Module 2)
+
+Open http://127.0.0.1:8000/ask/. Answers come only from indexed material and show their sources.
+
+Suhaib: when a `Resource` is saved with a file, call
+
+```python
+from ai_engine import services
+services.index_source(resource, path=resource.file.path)   # on save
+services.remove_source(resource)                           # on delete
+```
+
+`resource.title` is used as the citation title and `resource.get_absolute_url()` as its link.
+Supported files: PDF, PPTX, TXT, MD. Index one by hand with
+`python manage.py index_source repository.Resource <id> <path-to-file>`.

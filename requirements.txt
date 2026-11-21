@@ -3,3 +3,5 @@ python-dotenv>=1.0
 semantic-kernel>=1.46
 protobuf>=5.0            # needed by Semantic Kernel's agent runtime (orchestrations)
 openai>=1.40             # GitHub Models / Azure OpenAI clients used by Semantic Kernel
+pypdf>=4.0               # reads PDF lessons for Ask the Repository
+python-pptx>=1.0         # reads PowerPoint lessons

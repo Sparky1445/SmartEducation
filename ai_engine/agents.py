@@ -27,7 +27,7 @@ class AgentSpec:
         return self.module <= CURRENT_MODULE
 
 
-CURRENT_MODULE = 1
+CURRENT_MODULE = 2
 
 ROSTER: tuple[AgentSpec, ...] = (
     AgentSpec(
@@ -37,9 +37,28 @@ ROSTER: tuple[AgentSpec, ...] = (
         1,
     ),
     AgentSpec("Ingestor", "core", "Parses uploads, chunks and embeds them, auto-tags subject and level.", "ROLE: Ingestor.", 2),
-    AgentSpec("Retriever", "ask", "Finds the most relevant chunks for a question.", "ROLE: Retriever.", 2),
-    AgentSpec("Answerer", "ask", "Writes the answer from retrieved chunks only, with citations.", "ROLE: Answerer.", 2),
-    AgentSpec("Verifier", "ask", "Scores how well the answer matches its sources (Trust Score).", "ROLE: Verifier.", 2),
+    AgentSpec(
+        "Retriever", "ask", "Turns a student's question into a search query for the repository.",
+        "ROLE: Retriever.\nYou turn a student's question into a short keyword search query for a school "
+        "knowledge repository. Keep subject terms, drop filler words, add one or two close synonyms. "
+        "Reply with the query only: 3 to 10 words, no punctuation, no explanation.",
+        2,
+    ),
+    AgentSpec(
+        "Answerer", "ask", "Writes the answer from retrieved chunks only, with citations.",
+        "ROLE: Answerer.\nYou answer a student's question using ONLY the numbered SOURCES you are given. "
+        "Write 2 to 5 clear sentences for a school student. After each fact put its source number in "
+        "square brackets, like [1] or [2]. Never use outside knowledge. If the sources do not answer the "
+        "question, reply with exactly: NOT_IN_SOURCES",
+        2,
+    ),
+    AgentSpec(
+        "Verifier", "ask", "Scores how well the answer matches its sources (Trust Score).",
+        "ROLE: Verifier.\nYou check an ANSWER against its SOURCES. Score from 0 to 100 how fully every "
+        "statement in the answer is supported by the sources (100 = every claim is stated in the sources, "
+        "0 = none are). Reply with JSON only, no code fence: {\"score\": <int>, \"reason\": \"<one sentence>\"}",
+        2,
+    ),
     AgentSpec("Summariser", "outreach", "Key points of a resource.", "ROLE: Summariser.", 3),
     AgentSpec("Quizmaster", "outreach", "Quiz and flashcards.", "ROLE: Quizmaster.", 3),
     AgentSpec("Columnist", "outreach", "Blog or news article for the media portal.", "ROLE: Columnist.", 3),

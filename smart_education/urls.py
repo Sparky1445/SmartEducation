@@ -7,7 +7,7 @@ directly, and run records are visible to staff in the admin only.
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from django.views.generic import TemplateView
 
 admin.site.site_header = "Smart Education · Admin"
@@ -16,6 +16,7 @@ admin.site.index_title = "Site administration"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("ask/", include("ask.urls")),
     # Suhaib's apps plug in here, e.g. path("", include("media_portal.urls")),
     path("", TemplateView.as_view(template_name="core/home.html"), name="home"),
 ]
