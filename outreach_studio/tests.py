@@ -18,7 +18,7 @@ def teacher(publish=True) -> User:
     return user
 
 
-@override_settings(AI_ENGINE=MOCK, OUTREACH_RUN_INLINE=True)
+@override_settings(WEB_LINKS={"OFFLINE": True}, AI_ENGINE=MOCK, OUTREACH_RUN_INLINE=True)
 class PipelineTests(TestCase):
     def setUp(self):
         self.lesson = Group.objects.create(name="Class 7 · The Water Cycle")
@@ -56,7 +56,7 @@ class PipelineTests(TestCase):
         self.assertEqual(outreach_pipeline.parse_json('```json\n{"a": 1}\n```'), {"a": 1})
 
 
-@override_settings(AI_ENGINE=MOCK, OUTREACH_RUN_INLINE=True)
+@override_settings(WEB_LINKS={"OFFLINE": True}, AI_ENGINE=MOCK, OUTREACH_RUN_INLINE=True)
 class StudioViewTests(TestCase):
     def setUp(self):
         self.lesson = Group.objects.create(name="Class 7 · The Water Cycle")

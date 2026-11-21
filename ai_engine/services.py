@@ -7,10 +7,12 @@ are frozen (gate 1 of the plan); what happens inside grows module by module.
     index_source(obj, path=None, text=None) -> int (chunks)  (Module 2, live)
     remove_source(obj)                  -> None              (Module 2, live)
     ask(question, user=None)            -> dict              (Module 2, live)
+    related_links(topic)                -> dict              (Module 3b, live)
     build_outreach_kit(resource, user=None) -> int (kit id)  (Module 3, live)
     kit_status(kit_id)                  -> str               (Module 3, live)
     published_kits(limit=6)             -> list[OutreachKit] (Module 3, live)
-    suggest_next_resources(user)        -> list[int]         (Module 4)
+    suggest_next_resources(user, limit=6) -> list[(ct_id, object_id)] (Module 4, live)
+    suggest_next_kits(user, limit=4)    -> list[OutreachKit] (Module 4, live)
 
 Until a function's module lands it returns sample data of the final shape,
 so pages can be built and tested against it today.
@@ -66,9 +68,23 @@ def remove_source(obj) -> None:
 def ask(question: str, user=None) -> dict[str, Any]:
     """Answer from the repository only.
     Returns {"answer": str, "citations": [{"n", "title", "url", "locator", "excerpt",
-    "content_type", "object_id", "resource_id"}], "trust_score": 0-100, "in_repository": bool, "run_id": int}
+    "content_type", "object_id", "resource_id"}], "trust_score": 0-100, "in_repository": bool, "run_id": int,
+    "search_query": str (short topic keywords, good for related_links)}
     When the repository has no good answer, in_repository is False and answer is a polite fallback."""
     return ask_pipeline.ask(question, user).as_dict()
+
+
+def related_links(topic: str) -> dict[str, Any]:
+    """Related videos and websites from the open web for any topic.
+    Returns {"query", "videos": [{"title", "url", "channel", "thumbnail", "site"}],
+    "sites": [{"title", "url", "snippet", "site"}], "more": [{"title", "url", "site"}]}.
+    Never raises: a failing provider just gives fewer links."""
+    from . import web_links
+
+    try:
+        return web_links.related_links(topic)
+    except Exception:  # noqa: BLE001
+        return {"query": topic, "videos": [], "sites": [], "more": web_links.search_links(topic)}
 
 
 # --- Module 3 -----------------------------------------------------------------
@@ -99,6 +115,38 @@ def published_kits(limit: int = 6):
     )
 
 
-def suggest_next_resources(user) -> list[int]:
-    """Resource ids to show under 'Up next' on the student dashboard."""
-    return []
+# --- Module 4 -----------------------------------------------------------------
+def suggest_next_resources(user, limit: int = 6) -> list[tuple[int, int]]:
+    """Lessons related to what this user has been asking about, best first.
+    Returns (content_type_id, object_id) pairs, so it works for any indexed model."""
+    from ask.models import ChatQuery
+
+    from .retrieval import search
+
+    if not getattr(user, "is_authenticated", False):
+        return []
+    questions = list(ChatQuery.objects.filter(user=user).values_list("question", flat=True)[:10])
+    if not questions:
+        return []
+    seen: list[tuple[int, int]] = []
+    for hit in search(" ".join(questions), k=20):
+        key = (hit.chunk.content_type_id, hit.chunk.object_id)
+        if key not in seen:
+            seen.append(key)
+    return seen[:limit]
+
+
+def suggest_next_kits(user, limit: int = 4, exclude=()):
+    """Published kits made from the lessons suggest_next_resources picks; newest kits fill any gap."""
+    from outreach_studio.models import OutreachKit
+
+    published = OutreachKit.objects.filter(status=OutreachKit.Status.PUBLISHED).exclude(pk__in=list(exclude))
+    picks = []
+    for ct_id, obj_id in suggest_next_resources(user, limit=12):
+        kit = published.filter(content_type_id=ct_id, object_id=obj_id).order_by("-published_at").first()
+        if kit and kit not in picks:
+            picks.append(kit)
+    if len(picks) < limit:  # fill with the newest lessons, even ones already opened
+        newest = OutreachKit.objects.filter(status=OutreachKit.Status.PUBLISHED).order_by("-published_at")[: limit * 2]
+        picks += [k for k in newest if k not in picks]
+    return picks[:limit]

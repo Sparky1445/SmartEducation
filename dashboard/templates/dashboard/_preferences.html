@@ -1,0 +1,19 @@
+{% load ui %}
+<section>
+  {% section_head "Preferences" "saved on this device" %}
+  <form method="post" action="{% url 'dashboard:preferences' %}" class="prefs">
+    {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <span class="label">Theme</span>
+    <div class="seg">
+      <button name="theme" value="light" class="{% if pref_theme == 'light' %}is-on{% endif %}">Light</button>
+      <button name="theme" value="dark" class="{% if pref_theme == 'dark' %}is-on{% endif %}">Dark</button>
+    </div>
+    <span class="label">Translations first in</span>
+    <div class="seg">
+      <button name="lang" value="en" class="{% if pref_lang == 'en' %}is-on{% endif %}">English</button>
+      <button name="lang" value="hi" class="{% if pref_lang == 'hi' %}is-on{% endif %}">हिन्दी</button>
+      <button name="lang" value="mr" class="{% if pref_lang == 'mr' %}is-on{% endif %}">मराठी</button>
+      <button name="lang" value="kok" class="{% if pref_lang == 'kok' %}is-on{% endif %}">कोंकणी</button>
+    </div>
+  </form>
+</section>

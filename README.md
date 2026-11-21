@@ -84,3 +84,30 @@ Supported files: PDF, PPTX, TXT, MD. Index one by hand with
 - `/learn/` (public): published kits with key points, the article, a self-check quiz, flip cards and translations.
 - Permissions: `outreach_studio.add_outreachkit` to use the studio, `outreach_studio.publish_outreachkit` to publish.
   Put both in a "Teacher" group.
+
+## Related videos and websites (under every answer)
+
+Every question on `/ask/` also gets related videos and websites from the open web, even when the
+repository has no answer. Set either or both keys in `.env`:
+
+| Key | Gives | Where to get it |
+| --- | --- | --- |
+| `YOUTUBE_API_KEY` | YouTube videos (SafeSearch strict) | Google Cloud console → enable "YouTube Data API v3" → Credentials → API key |
+| `BRAVE_API_KEY` | websites and videos | brave.com/search/api (free monthly credit) |
+
+With no key you still get Wikipedia articles and search links to YouTube, Khan Academy and Wikipedia.
+Results are cached per topic for 24 h (`WebLookup` in the admin). `python manage.py test` never calls the web.
+
+## Engagement and dashboards (Module 4)
+
+| URL | What |
+| --- | --- |
+| `/feedback/` | Feedback form (validation, honeypot, 3 messages/hour per visitor). `?topic=` prefills a lesson request |
+| `/newsletter/` | Subscribe in English, Hindi, Marathi or Konkani; `/newsletter/unsubscribe/<token>/` to leave |
+| Learn lesson pages | Star rating and a comment thread (`{% load engagement_tags %}{% rating_for obj %}{% comments_for obj %}`) |
+| `/dashboard/` | Sends students to `/dashboard/me/` and teachers to `/dashboard/teacher/` |
+| Footer "Dark mode", dashboard Preferences | Theme and preferred language, stored in cookies (`se_theme`, `se_lang`) |
+| `/accounts/login/` | Temporary login page until Suhaib's `accounts` app takes over |
+
+Suhaib: to allow comments and ratings on your models, add them to `ALLOWED_TARGETS` in
+`engagement/views.py`, e.g. `("repository", "resource")`, then use the two template tags on the detail page.

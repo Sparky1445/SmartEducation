@@ -1,0 +1,54 @@
+{% load humanize ui %}
+<section id="comments" class="comments">
+  {% section_head "Discussion" count_label %}
+  {% for c in comments %}
+    <article class="comment" id="comment-{{ c.pk }}">
+      <header class="comment__head">
+        <span class="comment__avatar">{{ c.user.get_full_name|default:c.user.username|initials }}</span>
+        <span class="comment__who">{{ c.user.get_full_name|default:c.user.username }}{% if c.user.is_staff %} <span class="tag">teacher</span>{% endif %}</span>
+        <span class="label">{{ c.created_at|naturaltime }}</span>
+      </header>
+      <p class="comment__body">{{ c.body|urlize }}</p>
+      {% for r in c.replies.all %}
+        <div class="comment comment--reply" id="comment-{{ r.pk }}">
+          <header class="comment__head">
+            <span class="comment__avatar">{{ r.user.get_full_name|default:r.user.username|initials }}</span>
+            <span class="comment__who">{{ r.user.get_full_name|default:r.user.username }}{% if r.user.is_staff %} <span class="tag">teacher</span>{% endif %}</span>
+            <span class="label">{{ r.created_at|naturaltime }}</span>
+          </header>
+          <p class="comment__body">{{ r.body|urlize }}</p>
+          {% if r.user == user %}{% include "engagement/_comment_delete.html" with c=r %}{% endif %}
+        </div>
+      {% endfor %}
+      <div class="comment__actions">
+        {% if user.is_authenticated %}
+        <details class="reply">
+          <summary class="label">Reply</summary>
+          <form method="post" action="{% url 'engagement:comment_create' ct_id obj.pk %}" class="comment-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <input type="hidden" name="parent_id" value="{{ c.pk }}">
+            <textarea name="body" rows="2" class="field-input" required maxlength="1000"></textarea>
+            <button type="submit" class="btn btn--quiet">Reply</button>
+          </form>
+        </details>
+        {% endif %}
+        {% if c.user == user %}{% include "engagement/_comment_delete.html" %}{% endif %}
+      </div>
+    </article>
+  {% empty %}
+    <p class="muted small">No comments yet. Start the discussion.</p>
+  {% endfor %}
+
+  {% if user.is_authenticated %}
+  <form method="post" action="{% url 'engagement:comment_create' ct_id obj.pk %}" class="comment-form comment-form--main">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <label class="label" for="id_body">{{ form.body.label }}</label>
+    {{ form.body }}
+    <button type="submit" class="btn btn--primary">Post comment</button>
+  </form>
+  {% else %}
+    <p class="note"><a href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">Log in</a> to join the discussion.</p>
+  {% endif %}
+</section>

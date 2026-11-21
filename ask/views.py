@@ -30,10 +30,12 @@ def _remember(request, query: ChatQuery) -> None:
 
 
 def _owned(request, pk: int) -> ChatQuery:
-    """Visitors can only reopen their own questions (from their session history)."""
-    if pk not in _history(request):
-        raise ChatQuery.DoesNotExist
-    return ChatQuery.objects.get(pk=pk)
+    """Visitors can only reopen their own questions: from this session, or their account."""
+    if pk in _history(request):
+        return ChatQuery.objects.get(pk=pk)
+    if request.user.is_authenticated:
+        return ChatQuery.objects.get(pk=pk, user=request.user)
+    raise ChatQuery.DoesNotExist
 
 
 @require_http_methods(["GET", "POST"])
@@ -47,6 +49,7 @@ def ask_page(request):
             except Exception:  # noqa: BLE001 - logged by the engine; the visitor gets a calm message
                 messages.error(request, "Something went wrong while searching. Please try again in a moment.")
                 return redirect("ask:home")
+            web = services.related_links(result.get("search_query") or question)
             if not request.session.session_key:
                 request.session.save()
             query = ChatQuery.objects.create(
@@ -58,6 +61,7 @@ def ask_page(request):
                 trust_score=result["trust_score"],
                 in_repository=result["in_repository"],
                 run_id=result["run_id"],
+                web_links=web,
             )
             _remember(request, query)
             return redirect(f"{reverse('ask:home')}?q={query.pk}#answer")  # POST-redirect-GET

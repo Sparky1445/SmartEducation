@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load ui dashboard_tags humanize %}
+{% block title %}Teacher dashboard{% endblock %}
+{% block lede %}What students are asking, what the repository is missing, and what is waiting for you.{% endblock %}
+
+{% block content %}
+<div class="stack">
+  <div class="stats">
+    {% stat_card "Questions" q.total note="last 14 days" %}
+    {% stat_card "Answered from repository" q.found_pct unit="%" accent=True note="of those questions" %}
+    {% stat_card "Average source match" q.avg_match unit="/100" note="answered questions" %}
+    {% if q.helpful_pct is not None %}{% stat_card "Marked useful" q.helpful_pct unit="%" note="by students" %}{% else %}{% stat_card "Marked useful" "—" note="no votes yet" %}{% endif %}
+    {% stat_card "Lessons published" kits.published|default:0 note="on Learn" %}
+    {% stat_card "Subscribers" community.subscribers note="newsletter" %}
+  </div>
+</div>
+
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Waiting for you" "" %}
+      <ul class="roster">
+        <li><span class="roster__dot {% if to_review %}is-ready{% endif %}"></span><span class="roster__name"><a href="{% url 'outreach_studio:studio' %}?status=review">Kits to review</a><span class="roster__duty">{% for k in to_review %}{{ k|truncatechars:40 }}{% if not forloop.last %} · {% endif %}{% empty %}None right now{% endfor %}</span></span><span class="tag">{{ kits.review|default:0 }}</span></li>
+        <li><span class="roster__dot {% if community.open_feedback %}is-ready{% endif %}"></span><span class="roster__name"><a href="{% url 'admin:engagement_feedback_changelist' %}?resolved__exact=0">Open feedback</a><span class="roster__duty">Messages not marked resolved</span></span><span class="tag">{{ community.open_feedback }}</span></li>
+        <li><span class="roster__dot"></span><span class="roster__name"><a href="{% url 'admin:engagement_comment_changelist' %}">New comments</a><span class="roster__duty">This week, across all lessons</span></span><span class="tag">{{ community.comments_week }}</span></li>
+      </ul>
+    </section>
+    {% include "dashboard/_preferences.html" %}
+  </aside>
+
+  <div class="split__main">
+    <section>
+      {% section_head "Questions per day" "found · not found" %}
+      <div class="bars" role="img" aria-label="Questions per day for the last 14 days">
+        {% for d in series %}
+        <div class="bars__col" title="{{ d.day|date:'d M' }}: {{ d.total }} asked, {{ d.found }} found">
+          <span class="bars__n">{% if d.total %}{{ d.total }}{% endif %}</span>
+          <div class="bars__stack" style="height: calc({{ d.total_pct }}% * .86)">
+            <div class="bars__missing" style="flex: {{ d.missing }}"></div>
+            <div class="bars__found" style="flex: {{ d.found }}"></div>
+          </div>
+          <span class="bars__day">{{ d.day|date:"d" }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="legend"><span><i class="sw sw--found"></i>answered from the repository</span><span><i class="sw sw--missing"></i>not in the repository</span></div>
+    </section>
+
+    <section>
+      {% section_head "Gap radar" "topics we have no lesson on" %}
+      {% if gaps %}
+      <ol class="gaps">
+        {% for g in gaps %}
+        <li>
+          <div class="gaps__row">
+            <span class="gaps__topic">{{ g.topic }}</span>
+            <span class="gaps__bar"><span style="width: {% widthratio g.count gaps.0.count 100 %}%"></span></span>
+            <span class="label">{{ g.count }} ask{{ g.count|pluralize }}</span>
+          </div>
+          <p class="gaps__ex">{% for e in g.examples %}“{{ e|truncatechars:80 }}”{% if not forloop.last %} · {% endif %}{% endfor %}</p>
+        </li>
+        {% endfor %}
+      </ol>
+      <p class="small muted">Upload a lesson on a topic here and the Ask page will start answering it.</p>
+      {% else %}
+        <p class="muted small">No unanswered questions in the last 60 days.</p>
+      {% endif %}
+    </section>
+
+    <section>
+      {% section_head "Best-rated lessons" "" %}
+      <table class="ledger">
+        <thead><tr><th>Lesson</th><th class="num">Rating</th><th class="num">Votes</th></tr></thead>
+        <tbody>
+        {% for row in top_kits %}
+          <tr><td><a href="{{ row.kit.get_absolute_url }}">{{ row.kit }}</a></td><td class="num">{{ row.avg }} ★</td><td class="num">{{ row.n }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="ledger__empty">No ratings yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      {% section_head "Latest feedback" "" %}
+      <ol class="qlist">
+        {% for f in feedback %}<li><a href="{% url 'admin:engagement_feedback_change' f.pk %}">{{ f.message|truncatechars:90 }}</a><span class="qlist__meta">{{ f.get_category_display }} · {{ f.name }} · {{ f.created_at|naturaltime }}</span></li>
+        {% empty %}<li class="muted small">Nothing open.</li>{% endfor %}
+      </ol>
+    </section>
+  </div>
+</div>
+{% endblock %}

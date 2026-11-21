@@ -1,0 +1,5 @@
+<div class="stat {% if accent %}stat--accent{% endif %}">
+  <span class="label">{{ label }}</span>
+  <span class="stat__value">{{ value }}<span class="stat__unit">{{ unit }}</span></span>
+  {% if note %}<span class="stat__note">{{ note }}</span>{% endif %}
+</div>

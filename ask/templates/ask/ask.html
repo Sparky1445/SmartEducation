@@ -30,7 +30,7 @@
 
     <section>
       {% section_head "Good to know" "" %}
-      <p class="note">Answers quote the repository, never the open internet. If a topic is missing, we pass your question to the teachers so they can add a lesson on it.</p>
+      <p class="note">Answers come only from the repository. Videos and websites from the open web are listed separately under each answer. If a topic is missing, we pass your question to the teachers.</p>
     </section>
   </aside>
 
@@ -84,8 +84,11 @@
         <div class="answer__missing">
           <p class="label label--accent">Not in the repository yet</p>
           <p>{{ current.answer }}</p>
+          <p><a href="{% url 'engagement:feedback' %}?topic={{ current.question|urlencode }}&from={{ request.path|urlencode }}">Request a lesson on this topic &rarr;</a></p>
         </div>
       {% endif %}
+
+      {% if current.web_links %}{% include "ask/_web_links.html" with links=current.web_links %}{% endif %}
 
       <div class="answer__foot">
         {% if current.helpful is None %}

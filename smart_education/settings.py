@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     "ai_engine",  # internal only: no public pages
     "ask",
     "outreach_studio",
+    "engagement",
+    "dashboard",
     # --- Suhaib (add as each app lands) ---
     # "accounts",
     # "repository",
@@ -65,6 +67,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.preferences",
             ],
         },
     },
@@ -114,7 +117,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_URL = "/admin/login/"  # Suhaib swaps this for accounts:login
+LOGIN_URL = "login"  # Suhaib's accounts app can take this name over
+LOGIN_REDIRECT_URL = "dashboard:home"
+LOGOUT_REDIRECT_URL = "home"
 
 # --- AI engine (Atharwa) -----------------------------------------------------
 # LLM_PROVIDER: MOCK | GITHUB_MODELS | AZURE  (same names as PackPilot's .env)
@@ -132,6 +137,15 @@ AI_ENGINE = {
 
 # Answers whose source match is below this are replaced by "not in the repository".
 ASK_TRUST_THRESHOLD = int(os.getenv("ASK_TRUST_THRESHOLD", "55"))
+
+# Related videos and websites under every answer. Both keys are optional:
+# without them the page shows Wikipedia articles and search links.
+WEB_LINKS = {
+    "YOUTUBE_API_KEY": os.getenv("YOUTUBE_API_KEY", ""),
+    "BRAVE_API_KEY": os.getenv("BRAVE_API_KEY", ""),
+    "CACHE_HOURS": int(os.getenv("WEB_LINKS_CACHE_HOURS", "24")),
+    "OFFLINE": env_bool("WEB_LINKS_OFFLINE", False),
+}
 
 # Outreach kits are made in a background thread; tests set this True to run inline.
 OUTREACH_RUN_INLINE = False

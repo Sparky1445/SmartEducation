@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load ui dashboard_tags humanize %}
+{% block title %}My dashboard{% endblock %}
+{% block lede %}Your questions, the lessons you've opened, and what to read next.{% endblock %}
+
+{% block content %}
+<div class="stack">
+  <p class="display">Hello, {{ user.first_name|default:user.username }}.</p>
+  <div class="stats">
+    {% stat_card "Questions asked" asked note="all time" %}
+    {% stat_card "Found in the repository" found_pct unit="%" note="of your questions" accent=True %}
+    {% stat_card "Lessons opened" recent_kits|length note="on this device" %}
+    {% stat_card "Comments" comment_count note="in discussions" %}
+  </div>
+</div>
+
+<div class="split">
+  <aside class="split__aside">
+    {% include "dashboard/_preferences.html" %}
+    <section>
+      {% section_head "Newsletter" "" %}
+      {% if subscription %}
+        <p class="small">You get new lessons by email in {{ subscription.get_language_display }}.</p>
+      {% else %}
+        <p class="small muted">Get one short email when new lessons go live.</p>
+        <a class="btn btn--quiet" href="{% url 'engagement:newsletter' %}">Subscribe</a>
+      {% endif %}
+    </section>
+  </aside>
+
+  <div class="split__main">
+    <section>
+      {% section_head "Up next" "picked from your questions" %}
+      {% if up_next %}
+      <div class="tiles tiles--compact">
+        {% for kit in up_next %}
+        <a class="tile" href="{{ kit.get_absolute_url }}">
+          <span class="label label--accent">lesson</span>
+          <span class="tile__title">{{ kit.title }}</span>
+          <span class="tile__meta">open &rarr;</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+        <p class="muted small">Ask a few questions and we'll suggest lessons here. <a href="{% url 'outreach_studio:learn' %}">Browse all lessons</a>.</p>
+      {% endif %}
+    </section>
+
+    <section>
+      {% section_head "Recently opened" "" %}
+      {% if recent_kits %}
+        <ol class="qlist">{% for kit in recent_kits %}<li><a href="{{ kit.get_absolute_url }}">{{ kit.title }}</a>{% if kit.source_title != kit.title %}<span class="qlist__meta">from {{ kit.source_title|truncatechars:60 }}</span>{% endif %}</li>{% endfor %}</ol>
+      {% else %}<p class="muted small">Lessons you open on this device will be listed here.</p>{% endif %}
+    </section>
+
+    <section>
+      {% section_head "My questions" "" %}
+      <table class="ledger">
+        <thead><tr><th>Question</th><th>Result</th><th class="num">Asked</th></tr></thead>
+        <tbody>
+        {% for q in questions %}
+          <tr>
+            <td><a href="{% url 'ask:home' %}?q={{ q.pk }}#answer">{{ q.question|truncatechars:70 }}</a></td>
+            <td>{% if q.in_repository %}<span class="tag tag--ok">{{ q.source_count }} source{{ q.source_count|pluralize }}</span>{% else %}<span class="tag">not found</span>{% endif %}</td>
+            <td class="num">{{ q.created_at|naturaltime }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="3" class="ledger__empty">No questions yet. <a href="{% url 'ask:home' %}">Ask one</a>.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    {% if comments %}
+    <section>
+      {% section_head "My comments" "" %}
+      <ol class="qlist">{% for c in comments %}<li><a href="{{ c.target.get_absolute_url }}#comment-{{ c.pk }}">{{ c.body|truncatechars:80 }}</a><span class="qlist__meta">{{ c.created_at|naturaltime }}{% if not c.is_visible %} · hidden by a teacher{% endif %}</span></li>{% endfor %}</ol>
+    </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

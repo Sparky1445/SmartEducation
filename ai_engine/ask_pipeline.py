@@ -41,6 +41,7 @@ class AskResult:
     trust_score: int = 0
     in_repository: bool = False
     run_id: int | None = None
+    search_query: str = ""
 
     def as_dict(self) -> dict:
         return {
@@ -49,6 +50,7 @@ class AskResult:
             "trust_score": self.trust_score,
             "in_repository": self.in_repository,
             "run_id": self.run_id,
+            "search_query": self.search_query,
         }
 
 
@@ -193,6 +195,7 @@ def ask(question: str, user=None) -> AskResult:
     with tracked_run(AgentRun.Pipeline.ASK, question, user) as rec:
         with EventLoop() as loop:
             result = _pipeline(question, rec, loop)
+        result.search_query = rec.run.trace[0]["text"] if rec.run.trace else question
         result.run_id = rec.run.pk
         rec.run.output = result.as_dict()
     return result

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Log in{% endblock %}
+{% block lede %}Log in to comment, rate lessons and see your dashboard.{% endblock %}
+{% block content %}
+{# Temporary: Suhaib's accounts app replaces this with registration and profiles. #}
+<div class="split">
+  <aside class="split__aside"><section>{% section_head "New here?" "" %}<p class="muted small">Accounts are created by the school for now. Ask your teacher for a login.</p></section></aside>
+  <div class="split__main">
+    <section>
+      {% section_head "Log in" "" %}
+      <form method="post" class="stack-form" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<p class="note note--error">Username and password didn't match. Try again.</p>{% endif %}
+        <label class="field"><span class="label">Username</span><input type="text" name="username" class="field-input" autofocus autocomplete="username" value="{{ form.username.value|default:'' }}"></label>
+        <label class="field"><span class="label">Password</span><input type="password" name="password" class="field-input" autocomplete="current-password"></label>
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" class="btn btn--primary">Log in</button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

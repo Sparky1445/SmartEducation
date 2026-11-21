@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Feedback{% endblock %}
+{% block lede %}Tell us what to add, what to fix, or what you liked. Teachers read every message.{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Good to know" "" %}
+      <p class="note">Asking for a topic that isn't in the repository helps the most. Teachers use these requests to decide what to upload next.</p>
+    </section>
+  </aside>
+  <div class="split__main">
+    <section>
+      {% section_head "Send feedback" "" %}
+      <form method="post" class="stack-form" novalidate>
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+          {% if field.name == "website" %}
+            <div class="hp" aria-hidden="true">{{ field }}</div>
+          {% else %}
+          <label class="field">
+            <span class="label">{{ field.label }}</span>
+            {{ field }}
+            {% for error in field.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+          </label>
+          {% endif %}
+        {% endfor %}
+        {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+        {% for error in form.non_field_errors %}<p class="field__error">{{ error }}</p>{% endfor %}
+        <button type="submit" class="btn btn--primary">Send</button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

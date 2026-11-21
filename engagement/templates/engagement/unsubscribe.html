@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Unsubscribe{% endblock %}
+{% block content %}
+<section class="answer--empty">
+  <p class="display">Leave the newsletter?</p>
+  <p class="muted" style="margin: 16px 0;">{{ sub.email }} will stop getting emails from Smart Education.</p>
+  {% if sub.is_active %}
+  <form method="post">{% csrf_token %}<button class="btn btn--primary">Yes, unsubscribe</button></form>
+  {% else %}<p>This address is already unsubscribed.</p>{% endif %}
+</section>
+{% endblock %}

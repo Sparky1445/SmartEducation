@@ -1,0 +1,39 @@
+{# Related videos and websites from the open web. `links` = ChatQuery.web_links #}
+{% load ui %}
+{% if links.videos %}
+<div class="web-block">
+  {% section_head "Watch" "videos from the web" %}
+  <div class="videos">
+    {% for v in links.videos %}
+    <a class="video" href="{{ v.url }}" target="_blank" rel="noopener noreferrer">
+      <span class="video__thumb">{% if v.thumbnail %}<img src="{{ v.thumbnail }}" alt="" loading="lazy">{% endif %}<span class="video__play" aria-hidden="true">&#9654;</span></span>
+      <span class="video__title">{{ v.title|truncatechars:80 }}</span>
+      <span class="video__meta">{% if v.channel %}{{ v.channel }} · {% endif %}{{ v.site }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if links.sites %}
+<div class="web-block">
+  {% section_head "Read more on the web" "websites" %}
+  <ol class="weblist">
+    {% for s in links.sites %}
+    <li>
+      <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer" class="weblist__title">{{ s.title }}</a>
+      <span class="weblist__site">{{ s.site }}</span>
+      {% if s.snippet %}<p class="weblist__snippet">{{ s.snippet|truncatechars:200 }}</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</div>
+{% endif %}
+
+{% if links.more %}
+<div class="web-more">
+  <span class="label">Explore “{{ links.query }}”</span>
+  {% for m in links.more %}<a class="chip" href="{{ m.url }}" target="_blank" rel="noopener noreferrer">{{ m.title }} &nearr;</a>{% endfor %}
+</div>
+{% endif %}
+<p class="small muted web-note">Outside links open in a new tab. They are not part of the school repository, so check what you read.</p>

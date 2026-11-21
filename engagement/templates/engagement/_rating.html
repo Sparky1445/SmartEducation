@@ -1,0 +1,15 @@
+{% load engagement_tags %}
+<div class="rating">
+  <div class="rating__summary">
+    <span class="rating__stars" aria-label="{{ summary.average }} out of 5">{{ summary.average|stars_text }}</span>
+    <span class="label">{% if summary.count %}{{ summary.average }} · {{ summary.count }} rating{{ summary.count|pluralize }}{% else %}not rated yet{% endif %}</span>
+  </div>
+  {% if user.is_authenticated %}
+  <form method="post" action="{% url 'engagement:rate' ct_id obj.pk %}" class="rating__form">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <span class="label">{% if mine %}Your rating{% else %}Rate this lesson{% endif %}</span>
+    {% for s in stars %}<button type="submit" name="stars" value="{{ s }}" class="star {% if mine and s <= mine %}is-on{% endif %}" aria-label="{{ s }} star{{ s|pluralize }}">★</button>{% endfor %}
+  </form>
+  {% endif %}
+</div>

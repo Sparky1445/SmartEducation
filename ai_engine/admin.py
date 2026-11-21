@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AgentRun, DocumentChunk
+from .models import AgentRun, DocumentChunk, WebLookup
 
 
 @admin.register(AgentRun)
@@ -25,3 +25,24 @@ class DocumentChunkAdmin(admin.ModelAdmin):
     @admin.display(description="Text")
     def short_text(self, obj):
         return obj.text[:80]
+
+
+@admin.register(WebLookup)
+class WebLookupAdmin(admin.ModelAdmin):
+    list_display = ("query", "fetched_at", "video_count", "site_count")
+    search_fields = ("query",)
+    readonly_fields = ("results",)
+    actions = ["expire"]
+
+    @admin.display(description="Videos")
+    def video_count(self, obj):
+        return len(obj.results.get("videos", []))
+
+    @admin.display(description="Websites")
+    def site_count(self, obj):
+        return len(obj.results.get("sites", []))
+
+    @admin.action(description="Refresh these topics on next search")
+    def expire(self, request, queryset):
+        n = queryset.delete()[0]
+        self.message_user(request, f"{n} topic(s) will be looked up again.")

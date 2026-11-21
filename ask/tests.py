@@ -95,7 +95,7 @@ class SearchTests(TestCase):
         self.assertEqual(search("Who won the cricket world cup?"), [])
 
 
-@override_settings(AI_ENGINE=MOCK, ASK_TRUST_THRESHOLD=55)
+@override_settings(WEB_LINKS={"OFFLINE": True}, AI_ENGINE=MOCK, ASK_TRUST_THRESHOLD=55)
 class PipelineTests(TestCase):
     def setUp(self):
         make_source("Water cycle", WATER_CYCLE)
@@ -117,6 +117,12 @@ class PipelineTests(TestCase):
         self.assertEqual(result["answer"], FALLBACK_ANSWER)
         self.assertEqual(result["citations"], [])
 
+    def test_unanswered_question_still_gets_web_links(self):
+        self.client.post(reverse("ask:home"), {"question": "Who won the cricket world cup in 2011?"})
+        query = ChatQuery.objects.get()
+        self.assertFalse(query.in_repository)
+        self.assertTrue(query.web_links["more"])
+
     def test_low_trust_is_rejected(self):
         with self.settings(ASK_TRUST_THRESHOLD=101):
             result = services.ask("What is condensation in the water cycle?")
@@ -128,7 +134,7 @@ class PipelineTests(TestCase):
         self.assertEqual(parse_score("no idea")[0], 0)
 
 
-@override_settings(AI_ENGINE=MOCK)
+@override_settings(WEB_LINKS={"OFFLINE": True}, AI_ENGINE=MOCK)
 class AskPageTests(TestCase):
     def setUp(self):
         make_source("Water cycle", WATER_CYCLE)
@@ -147,6 +153,8 @@ class AskPageTests(TestCase):
         self.assertContains(page, "Source match")
         self.assertContains(page, 'href="#src-1"')
         self.assertNotContains(page, "Verifier")
+        self.assertContains(page, "youtube.com/results?search_query=")
+        self.assertContains(page, 'rel="noopener noreferrer"')
         self.assertEqual(self.client.session["ask_history"], [query.pk])
 
     def test_invalid_question(self):

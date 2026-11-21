@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load ui %}
+{% load ui engagement_tags %}
 
 {% block title %}{{ kit.title }}{% endblock %}
 {% block lede %}{% if kit.title != kit.source_title %}{{ kit.title }} · from the lesson “{{ kit.source_title }}”{% else %}{{ kit.title }}: key points, a short read and a quiz to check yourself.{% endif %}{% endblock %}
@@ -20,6 +20,7 @@
         <div class="match__row"><span class="label">Your quiz score</span><span class="label label--accent" data-quiz-score>not started</span></div>
       </div>
       {% endif %}
+      {% rating_for kit %}
       <p class="small muted">Published {{ kit.published_at|date:"d F Y" }}. Prepared from material uploaded by our teachers and checked before publishing.</p>
     </section>
     <a class="btn btn--quiet" href="{% url 'outreach_studio:learn' %}">&larr; All lessons</a>
@@ -46,6 +47,7 @@
       {% endfor %}
     </section>
     {% endif %}
+    {% comments_for kit %}
   </div>
 </div>
 {% endblock %}

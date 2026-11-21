@@ -79,3 +79,17 @@ class DocumentChunk(models.Model):
 
     def __str__(self) -> str:
         return f"{self.content_type.model}:{self.object_id} [{self.chunk_index}]"
+
+
+class WebLookup(models.Model):
+    """Cache of related videos and websites for a search topic (saves API calls)."""
+
+    query = models.CharField(max_length=200, unique=True)
+    results = models.JSONField(default=dict)
+    fetched_at = models.DateTimeField()
+
+    class Meta:
+        ordering = ["-fetched_at"]
+
+    def __str__(self) -> str:
+        return self.query

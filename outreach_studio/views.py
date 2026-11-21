@@ -204,7 +204,13 @@ def learn_kit(request, pk: int, slug: str):
     kit = get_object_or_404(OutreachKit.objects.prefetch_related("items"), pk=pk, status=OutreachKit.Status.PUBLISHED)
     if slug != kit.slug:
         return redirect(kit, permanent=True)
-    items = [i for i in sorted_items(kit) if i.approved]
+    recent = [kit.pk] + [i for i in request.session.get("recent_kits", []) if i != kit.pk]
+    request.session["recent_kits"] = recent[:10]  # shown on the student dashboard
+
+    lang = request.COOKIES.get("se_lang", "en")  # preferred language (cookie) goes first
+    items = [i for i in sorted_items(kit) if i.approved and i.kind != "translation"] + sorted(
+        (i for i in kit.items.all() if i.approved and i.kind == "translation"), key=lambda i: (i.language != lang, i.sort_key)
+    )
     by_kind = {}
     for item in items:
         by_kind.setdefault(item.kind, []).append(item)

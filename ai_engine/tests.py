@@ -17,7 +17,7 @@ MOCK = {
 }
 
 
-@override_settings(AI_ENGINE=MOCK)
+@override_settings(WEB_LINKS={"OFFLINE": True}, AI_ENGINE=MOCK)
 class ProviderTests(TestCase):
     def test_mock_is_default(self):
         info = resolve_provider()
@@ -37,7 +37,7 @@ class ProviderTests(TestCase):
             self.assertTrue(resolve_provider().fell_back)
 
 
-@override_settings(AI_ENGINE=MOCK)
+@override_settings(WEB_LINKS={"OFFLINE": True}, AI_ENGINE=MOCK)
 class PingServiceTests(TestCase):
     def test_ping_runs_a_real_semantic_kernel_agent(self):
         run = services.ping("Hello Librarian")
@@ -50,12 +50,12 @@ class PingServiceTests(TestCase):
     def test_contract_shapes(self):
         result = services.ask("What is osmosis?")
         self.assertEqual(
-            set(result), {"answer", "citations", "trust_score", "in_repository", "run_id"}
+            set(result), {"answer", "citations", "trust_score", "in_repository", "run_id", "search_query"}
         )
         self.assertEqual(services.suggest_next_resources(None), [])
 
 
-@override_settings(AI_ENGINE=MOCK)
+@override_settings(WEB_LINKS={"OFFLINE": True}, AI_ENGINE=MOCK)
 class NothingPublicTests(TestCase):
     """The engine works behind the scenes: no public page shows runs or agents."""
 
@@ -81,7 +81,7 @@ class NothingPublicTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
 
-@override_settings(AI_ENGINE=MOCK)
+@override_settings(WEB_LINKS={"OFFLINE": True}, AI_ENGINE=MOCK)
 class CommandTests(TestCase):
     def test_ai_ping_command(self):
         out = StringIO()

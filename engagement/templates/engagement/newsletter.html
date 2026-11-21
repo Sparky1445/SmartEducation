@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Newsletter{% endblock %}
+{% block lede %}One short email when new lessons go live. In English, Hindi, Marathi or Konkani. Leave any time.{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "What you get" "" %}
+      <ul class="points"><li>New lessons and quizzes, as soon as teachers publish them.</li><li>School events and announcements.</li><li>Nothing else. No ads, ever.</li></ul>
+    </section>
+  </aside>
+  <div class="split__main">
+    <section>
+      {% if subscribed %}
+        {% section_head "You're subscribed" subscribed.get_language_display %}
+        <p>We'll write to <strong>{{ subscribed.email }}</strong>. Changed your mind? <a href="{% url 'engagement:unsubscribe' subscribed.token %}">Unsubscribe</a>.</p>
+      {% else %}
+        {% section_head "Subscribe" "" %}
+        <form method="post" class="stack-form" novalidate>
+          {% csrf_token %}
+          {% for field in form.visible_fields %}
+            {% if field.name == "website" %}
+              <div class="hp" aria-hidden="true">{{ field }}</div>
+            {% elif field.name == "consent" %}
+              <label class="check">{{ field }} <span>{{ field.label }}</span></label>
+              {% for error in field.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+            {% else %}
+              <label class="field"><span class="label">{{ field.label }}</span>{{ field }}{% for error in field.errors %}<span class="field__error">{{ error }}</span>{% endfor %}</label>
+            {% endif %}
+          {% endfor %}
+          <button type="submit" class="btn btn--primary">Subscribe</button>
+        </form>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}
