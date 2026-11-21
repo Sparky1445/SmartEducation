@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}{% if object %}Edit lesson{% else %}Upload a lesson{% endif %}{% endblock %}
+{% block lede %}PDF and PowerPoint lessons are read automatically, so students can ask questions about them and you can make an outreach kit.{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Tips" "" %}
+      <ul class="points">
+        <li>Use a title students would search for, like "The water cycle".</li>
+        <li>PDFs made from Word or Google Docs work best. Scanned pages have no text to read.</li>
+        <li>For a YouTube video, choose type "Video" and paste the link.</li>
+      </ul>
+    </section>
+  </aside>
+  <div class="split__main">
+    <section>
+      {% section_head object|default:"New lesson" "" %}
+      <form method="post" enctype="multipart/form-data" class="stack-form" novalidate>
+        {% csrf_token %}
+        {% for error in form.non_field_errors %}<p class="note note--error">{{ error }}</p>{% endfor %}
+        {% for field in form %}
+          <label class="field">
+            <span class="label">{{ field.label }}</span>
+            {{ field }}
+            {% if field.help_text %}<span class="small muted">{{ field.help_text }}</span>{% endif %}
+            {% for error in field.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+          </label>
+        {% endfor %}
+        <div class="actions actions--row">
+          <button type="submit" class="btn btn--primary">{% if object %}Save changes{% else %}Upload{% endif %}</button>
+          {% if object %}<a class="btn btn--quiet" href="{% url 'repository:delete' object.pk %}">Delete lesson</a>{% endif %}
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

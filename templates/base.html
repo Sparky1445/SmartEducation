@@ -27,7 +27,7 @@
   {% block nav %}
   <nav class="nav" aria-label="Main">
     {% with section=request.resolver_match.app_name %}
-    <span class="is-soon" title="Coming soon">Repository</span>
+    <a href="{% url 'repository:list' %}" class="{% if section == 'repository' %}is-active{% endif %}">Repository</a>
     <a href="{% url 'ask:home' %}" class="{% if section == 'ask' %}is-active{% endif %}">Ask</a>
     <a href="{% url 'outreach_studio:learn' %}" class="{% if request.resolver_match.url_name == 'learn' or request.resolver_match.url_name == 'learn_kit' %}is-active{% endif %}">Learn</a>
     <span class="is-soon" title="Coming soon">Media</span>

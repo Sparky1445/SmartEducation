@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Delete lesson{% endblock %}
+{% block content %}
+<section class="answer--empty">
+  <p class="display">Delete “{{ object.title }}”?</p>
+  <p class="muted" style="margin: 16px 0;">The file, its comments, ratings and bookmarks are removed, and students can no longer ask about it. Outreach kits made from it stay until you delete them.</p>
+  <form method="post" class="actions actions--row">{% csrf_token %}<button class="btn btn--primary">Delete lesson</button><a class="btn btn--quiet" href="{{ object.get_absolute_url }}">Keep it</a></form>
+</section>
+{% endblock %}

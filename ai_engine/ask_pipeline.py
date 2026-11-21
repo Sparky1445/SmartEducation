@@ -20,7 +20,7 @@ from semantic_kernel.contents import ChatHistory
 from .agents import build_agent
 from .llm import get_chat_service, mock_responder, resolve_provider
 from .models import AgentRun
-from .retrieval import Hit, overlap_ratio, search, tokenize
+from .retrieval import STOPWORDS, Hit, overlap_ratio, search, tokenize
 from .runner import EventLoop, tracked_run
 
 NOT_IN_SOURCES = "NOT_IN_SOURCES"
@@ -103,7 +103,8 @@ def cited_numbers(answer: str, total: int) -> list[int]:
 # ---------------------------------------------------------------------------
 @mock_responder("Retriever")
 def _mock_retriever(user_text: str, history: ChatHistory) -> str:
-    return " ".join(dict.fromkeys(tokenize(user_text)))[:120] or user_text
+    words = [w for w in re.findall(r"[A-Za-z0-9']+", user_text) if len(w) > 2 and w.lower() not in STOPWORDS]
+    return " ".join(dict.fromkeys(w.lower() for w in words))[:120] or user_text
 
 
 @mock_responder("Answerer")

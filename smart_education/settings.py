@@ -38,9 +38,9 @@ INSTALLED_APPS = [
     "outreach_studio",
     "engagement",
     "dashboard",
+    "repository",
     # --- Suhaib (add as each app lands) ---
     # "accounts",
-    # "repository",
     # "media_portal",
     # "courses",
 ]
@@ -117,6 +117,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# PDFs open inside the lesson page (same site only).
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 LOGIN_URL = "login"  # Suhaib's accounts app can take this name over
 LOGIN_REDIRECT_URL = "dashboard:home"
 LOGOUT_REDIRECT_URL = "home"
@@ -172,3 +175,6 @@ LOGGING = {
         "ai_engine": {"handlers": ["console", "agent_file"], "level": "INFO", "propagate": False},
     },
 }
+
+# Uploads above this size are streamed to a temp file instead of memory.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024

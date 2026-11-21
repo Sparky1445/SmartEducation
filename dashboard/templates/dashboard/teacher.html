@@ -53,7 +53,7 @@
         {% for g in gaps %}
         <li>
           <div class="gaps__row">
-            <span class="gaps__topic">{{ g.topic }}</span>
+            <span class="gaps__topic">{% if perms.repository.add_resource %}<a href="{% url 'repository:upload' %}?title={{ g.topic|urlencode }}">{{ g.topic }}</a>{% else %}{{ g.topic }}{% endif %}</span>
             <span class="gaps__bar"><span style="width: {% widthratio g.count gaps.0.count 100 %}%"></span></span>
             <span class="label">{{ g.count }} ask{{ g.count|pluralize }}</span>
           </div>
@@ -61,7 +61,7 @@
         </li>
         {% endfor %}
       </ol>
-      <p class="small muted">Upload a lesson on a topic here and the Ask page will start answering it.</p>
+      <p class="small muted">Upload a lesson on one of these topics and the Ask page starts answering it. {% if perms.repository.add_resource %}<a href="{% url 'repository:upload' %}">Upload a lesson</a>{% endif %}</p>
       {% else %}
         <p class="muted small">No unanswered questions in the last 60 days.</p>
       {% endif %}

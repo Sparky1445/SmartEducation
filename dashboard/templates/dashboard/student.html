@@ -46,6 +46,14 @@
       {% endif %}
     </section>
 
+    {% if bookmarks %}
+    <section>
+      {% section_head "Bookmarks" "" %}
+      <div class="tiles tiles--compact">{% for b in bookmarks %}{% include "repository/_card.html" with r=b.resource %}{% endfor %}</div>
+      <p class="small" style="margin-top: 10px;"><a href="{% url 'repository:bookmarks' %}">All bookmarks</a></p>
+    </section>
+    {% endif %}
+
     <section>
       {% section_head "Recently opened" "" %}
       {% if recent_kits %}

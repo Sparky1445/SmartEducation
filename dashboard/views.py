@@ -10,6 +10,7 @@ from django.views.generic import TemplateView
 
 from ai_engine import services
 from ask.models import ChatQuery
+from repository.models import Bookmark
 from engagement.models import Comment, Feedback, NewsletterSubscriber
 from outreach_studio.models import OutreachKit
 
@@ -49,6 +50,7 @@ class StudentDashboardView(LoginRequiredMixin, TemplateView):
                 "up_next": services.suggest_next_kits(user, limit=4, exclude=recent_ids),
                 "comments": Comment.objects.filter(user=user).select_related("content_type")[:5],
                 "comment_count": Comment.objects.filter(user=user).count(),
+                "bookmarks": Bookmark.objects.filter(user=user, resource__status="published").select_related("resource__subject")[:4],
                 "subscription": NewsletterSubscriber.objects.filter(email__iexact=user.email, is_active=True).first() if user.email else None,
             }
         )

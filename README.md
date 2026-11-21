@@ -1,7 +1,7 @@
 # Smart Education
 
 A Django knowledge repository and outreach/media portal with an agentic AI engine (INT253, 2026–27).
-Team: Atharwa (AI engine, `engagement`, `dashboard`) · Suhaib (`accounts`, `repository`, `media_portal`, `courses`).
+Team: Atharwa (AI engine, `ask`, `outreach_studio`, `engagement`, `dashboard`, `repository`) · Suhaib (`accounts`, `media_portal`, `courses`).
 
 ## Run it (Windows)
 
@@ -12,6 +12,7 @@ pip install -r requirements.txt
 copy .env.example .env
 python manage.py migrate
 python manage.py createsuperuser
+python manage.py setup_roles      # creates the "Teacher" group
 python manage.py runserver
 ```
 
@@ -111,3 +112,18 @@ Results are cached per topic for 24 h (`WebLookup` in the admin). `python manage
 
 Suhaib: to allow comments and ratings on your models, add them to `ALLOWED_TARGETS` in
 `engagement/views.py`, e.g. `("repository", "resource")`, then use the two template tags on the detail page.
+
+## Repository (Module 5)
+
+| URL | What |
+| --- | --- |
+| `/repository/` | Browse and search lessons (GET form: words, subject, class, type, sort), paginated |
+| `/repository/subject/<slug>/`, `/repository/archive/<year>/` | By subject; by year (regex URL) |
+| `/repository/<id>-<slug>/` | Lesson page: PDF viewer or YouTube player, download, tags, rating, discussion, bookmark |
+| `/repository/upload/`, `/<id>/edit/`, `/<id>/delete/` | Teachers only (Teacher group) |
+| `/repository/bookmarks/` | A student's saved lessons |
+
+Uploading or editing a published lesson indexes it automatically (signals), so the Ask page can answer
+from it and Outreach Studio can make a kit. PDF, PPTX, TXT and MD files are read; for videos and links
+the title, description and tags are searchable. Drafts are hidden and not searchable.
+Ten subjects are created by a migration; add more in the admin.

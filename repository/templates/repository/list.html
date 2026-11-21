@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load ui humanize %}
+{% block title %}{% if subject %}{{ subject }}{% else %}Repository{% endif %}{% endblock %}
+{% block lede %}{% if subject %}{{ subject.description|default:"Every lesson in this subject." }}{% else %}Notes, slides, videos and links uploaded by our teachers, by subject and class.{% endif %}{% endblock %}
+
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Subjects" "" %}
+      <ul class="roster">
+        <li><span class="roster__dot {% if not subject %}is-ready{% endif %}"></span><span class="roster__name"><a href="{% url 'repository:list' %}">All subjects</a></span><span></span></li>
+        {% for s in subjects %}
+        <li><span class="roster__dot {% if subject == s %}is-ready{% endif %}"></span><span class="roster__name"><a href="{{ s.get_absolute_url }}">{{ s.name }}</a></span><span class="tag">{{ s.n }}</span></li>
+        {% endfor %}
+      </ul>
+    </section>
+    <section>
+      {% if perms.repository.add_resource %}<a class="btn btn--primary" href="{% url 'repository:upload' %}{% if subject %}?subject={{ subject.slug }}{% endif %}">Upload a lesson</a>{% endif %}
+      {% if user.is_authenticated %}<p class="small" style="margin-top: 14px;"><a href="{% url 'repository:bookmarks' %}">Your bookmarks</a></p>{% endif %}
+    </section>
+  </aside>
+
+  <div class="split__main">
+    <section>
+      <form method="get" class="field" role="search">
+        <label for="id_q" class="label">Search the repository</label>
+        <div class="field__row">{{ form.q }}<button type="submit" class="btn btn--primary btn--run">Search</button></div>
+        <div class="filter-row">
+          {% if not subject %}{{ form.subject }}{% endif %}{{ form.grade }}{{ form.kind }}{{ form.sort }}
+          {% if filtered %}<a href="{{ request.path }}" class="small">Clear filters</a>{% endif %}
+        </div>
+      </form>
+    </section>
+
+    <section>
+      {% section_head year|default_if_none:"Lessons" page_obj.paginator.count|stringformat:"d"|add:" found" %}
+      {% if resources %}
+        <div class="tiles">{% for r in resources %}{% include "repository/_card.html" %}{% endfor %}</div>
+        {% if page_obj.has_other_pages %}
+        <nav class="filters" style="margin-top: 24px;">
+          {% if page_obj.has_previous %}<a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">&larr; Previous</a>{% endif %}
+          <span class="label">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+          {% if page_obj.has_next %}<a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Next &rarr;</a>{% endif %}
+        </nav>
+        {% endif %}
+      {% else %}
+        <div class="answer__missing">
+          <p class="label label--accent">Nothing found</p>
+          <p>No lesson matches that yet. Try fewer words, or <a href="{% url 'ask:home' %}">ask the question directly</a>{% if form.q.value %}, or <a href="{% url 'engagement:feedback' %}?topic={{ form.q.value|urlencode }}">request a lesson on “{{ form.q.value }}”</a>{% endif %}.</p>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

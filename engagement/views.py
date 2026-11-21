@@ -15,7 +15,7 @@ from .forms import CommentForm, FeedbackForm, NewsletterForm, RatingForm
 from .models import Comment, NewsletterSubscriber, Rating
 
 FEEDBACK_LIMIT = 3  # messages per visitor per hour (kept in the session)
-ALLOWED_TARGETS = {("outreach_studio", "outreachkit")}  # Suhaib adds e.g. ("repository", "resource")
+ALLOWED_TARGETS = {("outreach_studio", "outreachkit"), ("repository", "resource")}
 
 
 def _back(request, fallback="/"):

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Bookmarks{% endblock %}
+{% block lede %}Lessons you saved to come back to.{% endblock %}
+{% block content %}
+<div class="stack">
+  {% section_head "Your bookmarks" bookmarks|length|stringformat:"d"|add:" saved" %}
+  {% if bookmarks %}
+    <div class="tiles">{% for b in bookmarks %}{% include "repository/_card.html" with r=b.resource %}{% endfor %}</div>
+  {% else %}
+    <p class="muted">No bookmarks yet. Open a lesson and press Bookmark. <a href="{% url 'repository:list' %}">Browse lessons</a>.</p>
+  {% endif %}
+</div>
+{% endblock %}

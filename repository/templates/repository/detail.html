@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load ui engagement_tags humanize %}
+{% block title %}{{ r.title }}{% endblock %}
+{% block lede %}{{ r.subject }}{% if r.grade %} · Class {{ r.grade }}{% endif %} · {{ r.get_kind_display }}{% endblock %}
+
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "About" "" %}
+      <dl class="kv">
+        <dt>Subject</dt><dd><a href="{{ r.subject.get_absolute_url }}">{{ r.subject }}</a></dd>
+        {% if r.grade %}<dt>Class</dt><dd>{{ r.grade }}</dd>{% endif %}
+        <dt>Type</dt><dd>{{ r.get_kind_display }}</dd>
+        {% if r.uploaded_by %}<dt>Shared by</dt><dd>{{ r.uploaded_by.get_full_name|default:r.uploaded_by.username }}</dd>{% endif %}
+        <dt>Added</dt><dd class="mono">{{ r.created_at|date:"d M Y" }}</dd>
+        <dt>Views</dt><dd class="mono">{{ r.views|intcomma }}</dd>
+      </dl>
+      {% if r.tags.all %}<div class="chips">{% for t in r.tags.all %}<a class="chip" href="{% url 'repository:list' %}?tag={{ t.slug }}">{{ t.name }}</a>{% endfor %}</div>{% endif %}
+      {% rating_for r %}
+    </section>
+    <section class="actions">
+      {% if user.is_authenticated %}
+      <form method="post" action="{% url 'repository:bookmark' r.pk %}">{% csrf_token %}<button class="btn {% if bookmarked %}btn--quiet{% endif %}">{% if bookmarked %}Remove bookmark{% else %}Bookmark{% endif %}</button></form>
+      {% endif %}
+      {% if can_edit %}
+        <a class="btn btn--quiet" href="{% url 'repository:edit' r.pk %}">Edit</a>
+        {% if perms.outreach_studio.add_outreachkit and r.indexed_chunks %}
+        <form method="post" action="{% url 'outreach_studio:kit_create' ct_id r.pk %}">{% csrf_token %}<button class="btn btn--quiet">Make outreach kit</button></form>
+        {% endif %}
+      {% endif %}
+    </section>
+    {% if can_edit and r.index_note %}<p class="note note--error">{{ r.index_note }}</p>{% endif %}
+    {% if can_edit and r.status == 'draft' %}<p class="note">Draft: only teachers can see this lesson.</p>{% endif %}
+  </aside>
+
+  <div class="split__main">
+    <section>
+      <h2 class="article__headline">{{ r.title }}</h2>
+      {% if r.description %}<p class="article__standfirst">{{ r.description|linebreaksbr }}</p>{% endif %}
+
+      {% if r.youtube_id %}
+        <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/{{ r.youtube_id }}" title="{{ r.title }}" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+      {% elif r.file and r.extension == ".pdf" %}
+        <div class="embed embed--doc"><iframe src="{{ r.file.url }}" title="{{ r.title }}" loading="lazy"></iframe></div>
+      {% elif r.is_image %}
+        <img class="embed-img" src="{{ r.file.url }}" alt="{{ r.title }}">
+      {% elif r.file and r.extension == ".mp4" %}
+        <video class="embed-img" src="{{ r.file.url }}" controls preload="metadata"></video>
+      {% endif %}
+
+      <div class="actions actions--row">
+        {% if r.file %}<a class="btn btn--primary" href="{{ r.file.url }}" download>Download {{ r.extension|cut:"."|upper }}</a>{% endif %}
+        {% if r.url and not r.youtube_id %}<a class="btn btn--primary" href="{{ r.url }}" target="_blank" rel="noopener noreferrer">Open link</a>{% endif %}
+        {% if r.indexed_chunks %}<a class="btn" href="{% url 'ask:home' %}">Ask a question about it</a>{% endif %}
+        {% if kit %}<a class="btn" href="{{ kit.get_absolute_url }}">Revise: key points and quiz</a>{% endif %}
+      </div>
+    </section>
+
+    {% if related %}
+    <section>
+      {% section_head "More in "|add:r.subject.name "" %}
+      <div class="tiles tiles--compact">{% for r in related %}{% include "repository/_card.html" %}{% endfor %}</div>
+    </section>
+    {% endif %}
+
+    {% comments_for r %}
+  </div>
+</div>
+{% endblock %}

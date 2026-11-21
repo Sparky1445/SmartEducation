@@ -1,0 +1,6 @@
+<a class="tile" href="{{ r.get_absolute_url }}">
+  <span class="label label--accent">{{ r.subject }}{% if r.grade %} · class {{ r.grade }}{% endif %}</span>
+  <span class="tile__title">{{ r.title }}</span>
+  {% if r.description %}<span class="tile__text">{{ r.description|truncatechars:120 }}</span>{% else %}<span class="tile__text"></span>{% endif %}
+  <span class="tile__meta">{{ r.get_kind_display }}{% if r.indexed_chunks %} · can be asked about{% endif %}</span>
+</a>

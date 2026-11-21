@@ -18,6 +18,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),  # login/logout until Suhaib's accounts app lands
     path("ask/", include("ask.urls")),
+    path("repository/", include("repository.urls")),
     path("dashboard/", include("dashboard.urls")),
     path("", include("engagement.urls")),
     path("", include("outreach_studio.urls")),
