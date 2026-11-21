@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load ui humanize %}
+
+{% block title %}{{ kit }}{% endblock %}
+{% block lede %}Review each part of the kit. Edit anything that needs it, approve what is ready, then publish. Only approved parts go live.{% endblock %}
+
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Kit" kit.get_status_display %}
+      <dl class="kv">
+        <dt>Lesson</dt><dd>{{ kit.source_title }}</dd>
+        <dt>Status</dt><dd><span class="tag {% if kit.status == 'published' %}tag--solid{% elif kit.status == 'review' %}tag--ok{% elif kit.status == 'failed' %}tag--err{% else %}tag--live{% endif %}" data-status-tag>{{ kit.get_status_display }}</span></dd>
+        {% if total %}<dt>Approved</dt><dd class="mono">{{ approved }} of {{ total }} parts</dd>{% endif %}
+        <dt>Made</dt><dd class="mono">{{ kit.created_at|date:"d M Y, H:i" }}</dd>
+        {% if kit.published_at and kit.status == 'published' %}<dt>Live since</dt><dd class="mono">{{ kit.published_at|date:"d M Y, H:i" }}</dd>{% endif %}
+      </dl>
+      {% if kit.quality_notes %}
+        <p class="note"><span class="label label--accent">Quality check</span><br>{{ kit.quality_notes }}</p>
+      {% endif %}
+    </section>
+
+    {% if not kit.is_busy %}
+    <section>
+      {% section_head "Actions" "" %}
+      <div class="actions">
+        {% if kit.status == 'published' %}
+          <a class="btn btn--primary" href="{{ kit.get_absolute_url }}">View on Learn &rarr;</a>
+          {% if can_publish %}
+          <form method="post" action="{% url 'outreach_studio:kit_unpublish' kit.pk %}">{% csrf_token %}<button class="btn">Unpublish</button></form>
+          {% endif %}
+        {% elif kit.status == 'review' and can_publish %}
+          <form method="post" action="{% url 'outreach_studio:kit_publish' kit.pk %}">{% csrf_token %}<button class="btn btn--primary">Publish approved parts</button></form>
+        {% endif %}
+        <form method="post" action="{% url 'outreach_studio:kit_regenerate' kit.pk %}">{% csrf_token %}<button class="btn btn--quiet">Make a fresh kit</button></form>
+      </div>
+    </section>
+    {% endif %}
+    <a class="btn btn--quiet" href="{% url 'outreach_studio:studio' %}">&larr; All kits</a>
+  </aside>
+
+  <div class="split__main">
+    {% if kit.is_busy %}
+      <section class="preparing" data-poll="{% url 'outreach_studio:kit_status' kit.pk %}">
+        <p class="display">Preparing your kit<span class="dots"></span></p>
+        <p class="muted">Study notes, a quiz, an article, social posts and three translations are being written from “{{ kit.source_title }}”. This page refreshes by itself when they are ready.</p>
+        <div class="progress"><div class="progress__bar"></div></div>
+      </section>
+    {% elif kit.status == 'failed' %}
+      <section>
+        <div class="answer__missing"><p class="label label--accent">Not prepared</p><p>{{ kit.error }}</p></div>
+      </section>
+    {% else %}
+      <nav class="filters">
+        {% for card in cards %}<a href="#item-{{ card.item.pk }}">{{ card.item }}</a>{% endfor %}
+      </nav>
+      {% for card in cards %}
+      {% with item=card.item %}
+      <section id="item-{{ item.pk }}" class="kit-item {% if item.approved %}is-approved{% endif %}">
+        <div class="section-head">
+          <h2>{{ item }}</h2>
+          <span>
+            {% if item.needs_check %}<span class="tag tag--err">please check</span>{% endif %}
+            {% if item.edited %}<span class="tag">edited</span>{% endif %}
+            {% if item.approved %}<span class="tag tag--solid">approved</span>{% endif %}
+          </span>
+        </div>
+        {% include "outreach_studio/_item_body.html" with public=False %}
+
+        <div class="kit-item__bar">
+          <form method="post" action="{% url 'outreach_studio:item_approve' item.pk %}">
+            {% csrf_token %}
+            {% if item.approved %}
+              <input type="hidden" name="approved" value="0"><button class="btn btn--quiet">Undo approval</button>
+            {% else %}
+              <input type="hidden" name="approved" value="1"><button class="btn">Approve</button>
+            {% endif %}
+          </form>
+          {% if card.form %}
+          <details class="editor">
+            <summary class="btn btn--quiet">Edit</summary>
+            <form method="post" action="{% url 'outreach_studio:item_edit' item.pk %}" class="editor__form">
+              {% csrf_token %}
+              {% for field in card.form %}
+                <label class="field">
+                  <span class="label">{{ field.label }}</span>
+                  {{ field }}
+                  {% if field.help_text %}<span class="small muted">{{ field.help_text }}</span>{% endif %}
+                </label>
+              {% endfor %}
+              <button type="submit" class="btn btn--primary">Save changes</button>
+            </form>
+          </details>
+          {% endif %}
+        </div>
+      </section>
+      {% endwith %}
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var box = document.querySelector("[data-poll]");
+    if (box) {
+      var tick = function () {
+        fetch(box.dataset.poll, { headers: { "Accept": "application/json" } })
+          .then(function (r) { return r.json(); })
+          .then(function (d) { if (!d.busy) { window.location.reload(); } else { setTimeout(tick, 3000); } })
+          .catch(function () { setTimeout(tick, 5000); });
+      };
+      setTimeout(tick, 3000);
+    }
+  })();
+</script>
+{% endblock %}

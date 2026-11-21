@@ -53,8 +53,9 @@ Portal code calls only `ai_engine/services.py`. Pages show results only (answers
 | `index_source(obj, path=None, text=None)` | number of chunks indexed | Module 2 |
 | `remove_source(obj)` | `None` | Module 2 |
 | `ask(question, user=None)` | `{answer, citations, trust_score, in_repository, run_id}` | Module 2 |
-| `build_outreach_kit(resource_id)` | kit id | Module 3 |
+| `build_outreach_kit(resource, user=None)` | kit id (runs in the background) | Module 3 |
 | `kit_status(kit_id)` | `queued / running / review / published / failed` | Module 3 |
+| `published_kits(limit=6)` | newest published kits, for the homepage | Module 3 |
 | `suggest_next_resources(user)` | list of resource ids | Module 4 |
 
 Until a function goes live it returns sample data of the final shape.
@@ -74,3 +75,12 @@ services.remove_source(resource)                           # on delete
 `resource.title` is used as the citation title and `resource.get_absolute_url()` as its link.
 Supported files: PDF, PPTX, TXT, MD. Index one by hand with
 `python manage.py index_source repository.Resource <id> <path-to-file>`.
+
+## Outreach Studio and Learn (Module 3)
+
+- `/studio/` (teachers): pick an indexed lesson, press **Make kit**. Study notes, a quiz with flashcards,
+  an article, social posts with a poster, and Hindi/Marathi/Konkani summaries are written in parallel,
+  checked against the lesson, and land in a review page. Edit, approve, publish.
+- `/learn/` (public): published kits with key points, the article, a self-check quiz, flip cards and translations.
+- Permissions: `outreach_studio.add_outreachkit` to use the studio, `outreach_studio.publish_outreachkit` to publish.
+  Put both in a "Teacher" group.

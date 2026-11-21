@@ -17,6 +17,7 @@ admin.site.index_title = "Site administration"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("ask/", include("ask.urls")),
+    path("", include("outreach_studio.urls")),
     # Suhaib's apps plug in here, e.g. path("", include("media_portal.urls")),
     path("", TemplateView.as_view(template_name="core/home.html"), name="home"),
 ]

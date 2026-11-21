@@ -1,0 +1,64 @@
+{# Renders one kit item. `item` is a KitItem; `public` hides teacher-only details. #}
+{% with c=item.content %}
+{% if item.kind == "summary" %}
+  {% if c.title %}<h3 class="kit-h3">{{ c.title }}</h3>{% endif %}
+  <ol class="points">{% for p in c.points %}<li>{{ p }}</li>{% endfor %}</ol>
+
+{% elif item.kind == "article" %}
+  <h3 class="article__headline">{{ c.headline }}</h3>
+  {% if c.standfirst %}<p class="article__standfirst">{{ c.standfirst }}</p>{% endif %}
+  <div class="article__body">{% for para in c.body %}<p>{{ para }}</p>{% endfor %}</div>
+
+{% elif item.kind == "quiz" %}
+  <ol class="quiz" data-quiz>
+    {% for q in c.questions %}
+    <li class="quiz__q" data-answer="{{ q.answer }}">
+      <p class="quiz__text">{{ q.q }}</p>
+      <div class="quiz__options">
+        {% for opt in q.options %}
+          {% if public %}
+            <button type="button" class="quiz__opt" data-index="{{ forloop.counter0 }}">{{ opt }}</button>
+          {% else %}
+            <span class="quiz__opt {% if forloop.counter0 == q.answer %}is-right{% endif %}">{{ opt }}</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% if q.why %}<p class="quiz__why" {% if public %}hidden{% endif %}>{{ q.why }}</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  {% if c.flashcards %}
+  <div id="cards" class="label" style="margin: 26px 0 10px;">Flashcards · tap to turn</div>
+  <div class="cards">
+    {% for card in c.flashcards %}
+    <button type="button" class="card" aria-pressed="false">
+      <span class="card__front">{{ card.front }}</span>
+      <span class="card__back">{{ card.back }}</span>
+    </button>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+{% elif item.kind == "social" %}
+  <div class="posts">
+    {% for post in c.posts %}
+    <div class="post">
+      <div class="post__head"><span class="label">{{ post.platform }}</span>
+        <button type="button" class="chip chip--tiny" data-copy="{{ post.text }}">Copy</button></div>
+      <p class="post__text">{{ post.text }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% if c.poster.headline %}
+  <div class="poster">
+    <div class="poster__kicker">Smart Education</div>
+    <div class="poster__headline">{{ c.poster.headline }}</div>
+    <div class="poster__sub">{{ c.poster.subline }}</div>
+    <div class="poster__cta">{{ c.poster.call_to_action }} &rarr;</div>
+  </div>
+  {% endif %}
+
+{% elif item.kind == "translation" %}
+  <p class="translation" lang="{% if item.language == 'kok' %}kok{% else %}{{ item.language }}{% endif %}">{{ c.text }}</p>
+{% endif %}
+{% endwith %}

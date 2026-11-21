@@ -52,8 +52,6 @@ class PingServiceTests(TestCase):
         self.assertEqual(
             set(result), {"answer", "citations", "trust_score", "in_repository", "run_id"}
         )
-        self.assertIsInstance(services.build_outreach_kit(1), int)
-        self.assertIn(services.kit_status(0), {"queued", "running", "review", "published", "failed"})
         self.assertEqual(services.suggest_next_resources(None), [])
 
 

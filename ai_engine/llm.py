@@ -20,7 +20,7 @@ from typing import Any, Callable
 
 from django.conf import settings
 from semantic_kernel.connectors.ai.chat_completion_client_base import ChatCompletionClientBase
-from semantic_kernel.contents import AuthorRole, ChatHistory, ChatMessageContent
+from semantic_kernel.contents import AuthorRole, ChatHistory, ChatMessageContent, StreamingChatMessageContent
 
 GITHUB_MODELS_URL = "https://models.github.ai/inference"
 MOCK_MODEL = "mock-scholar-1"
@@ -128,9 +128,39 @@ class MockChatCompletion(ChatCompletionClientBase):
         ]
 
 
+    async def _inner_get_streaming_chat_message_contents(
+        self, chat_history: ChatHistory, settings: Any, function_invoke_attempt: int = 0
+    ):
+        """Orchestrations stream; the mock sends its whole reply as one chunk."""
+        (message,) = await self._inner_get_chat_message_contents(chat_history, settings)
+        yield [
+            StreamingChatMessageContent(
+                role=AuthorRole.ASSISTANT,
+                content=message.content,
+                choice_index=0,
+                ai_model_id=MOCK_MODEL,
+                metadata=message.metadata,
+            )
+        ]
+
+
 # ---------------------------------------------------------------------------
 # Service factory
 # ---------------------------------------------------------------------------
+def _fresh_http_client(timeout: int):
+    """No kept-alive connections: every call opens a new one.
+
+    Same fix as PackPilot: on some networks an idle pooled connection to
+    Azure hangs for ~30 s before failing over. Fresh connections avoid it.
+    """
+    import httpx
+
+    return httpx.AsyncClient(
+        limits=httpx.Limits(max_keepalive_connections=0, max_connections=20),
+        timeout=httpx.Timeout(timeout, connect=10.0),
+    )
+
+
 def get_chat_service(info: ProviderInfo | None = None) -> ChatCompletionClientBase:
     info = info or resolve_provider()
     cfg = settings.AI_ENGINE
@@ -140,7 +170,11 @@ def get_chat_service(info: ProviderInfo | None = None) -> ChatCompletionClientBa
         from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
 
         client = AsyncOpenAI(
-            base_url=GITHUB_MODELS_URL, api_key=cfg["GITHUB_TOKEN"], timeout=cfg["TIMEOUT_SECONDS"]
+            base_url=GITHUB_MODELS_URL,
+            api_key=cfg["GITHUB_TOKEN"],
+            timeout=cfg["TIMEOUT_SECONDS"],
+            max_retries=2,
+            http_client=_fresh_http_client(cfg["TIMEOUT_SECONDS"]),
         )
         return OpenAIChatCompletion(ai_model_id=info.model, async_client=client, service_id="chat")
 
@@ -157,6 +191,8 @@ def get_chat_service(info: ProviderInfo | None = None) -> ChatCompletionClientBa
             api_key=cfg["AZURE_KEY"],
             api_version=cfg["AZURE_API_VERSION"],
             timeout=cfg["TIMEOUT_SECONDS"],
+            max_retries=2,
+            http_client=_fresh_http_client(cfg["TIMEOUT_SECONDS"]),
         )
         return AzureChatCompletion(deployment_name=info.model, async_client=client, service_id="chat")
 

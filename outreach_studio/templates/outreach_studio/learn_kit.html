@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}{{ kit.title }}{% endblock %}
+{% block lede %}{% if kit.title != kit.source_title %}{{ kit.title }} · from the lesson “{{ kit.source_title }}”{% else %}{{ kit.title }}: key points, a short read and a quiz to check yourself.{% endif %}{% endblock %}
+
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "In this lesson" "" %}
+      <ol class="qlist">
+        {% if by_kind.summary %}<li><a href="#notes">Key points</a></li>{% endif %}
+        {% if by_kind.article %}<li><a href="#read">Read</a></li>{% endif %}
+        {% if by_kind.quiz %}<li><a href="#quiz">Quiz and flashcards</a></li>{% endif %}
+        {% if by_kind.translation %}<li><a href="#languages">Other languages</a></li>{% endif %}
+      </ol>
+      {% if by_kind.quiz %}
+      <div class="match">
+        <div class="match__row"><span class="label">Your quiz score</span><span class="label label--accent" data-quiz-score>not started</span></div>
+      </div>
+      {% endif %}
+      <p class="small muted">Published {{ kit.published_at|date:"d F Y" }}. Prepared from material uploaded by our teachers and checked before publishing.</p>
+    </section>
+    <a class="btn btn--quiet" href="{% url 'outreach_studio:learn' %}">&larr; All lessons</a>
+  </aside>
+
+  <div class="split__main">
+    {% for item in by_kind.summary %}
+    <section id="notes">{% section_head "Key points" "" %}{% include "outreach_studio/_item_body.html" with public=True %}</section>
+    {% endfor %}
+
+    {% for item in by_kind.article %}
+    <section id="read">{% section_head "Read" "" %}{% include "outreach_studio/_item_body.html" with public=True %}</section>
+    {% endfor %}
+
+    {% for item in by_kind.quiz %}
+    <section id="quiz">{% section_head "Check yourself" "tap an answer" %}{% include "outreach_studio/_item_body.html" with public=True %}</section>
+    {% endfor %}
+
+    {% if by_kind.translation %}
+    <section id="languages">
+      {% section_head "Other languages" "" %}
+      {% for item in by_kind.translation %}
+        <div class="lang-block"><span class="label label--accent">{{ item.get_language_display }}</span>{% include "outreach_studio/_item_body.html" with public=True %}</div>
+      {% endfor %}
+    </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

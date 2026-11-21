@@ -7,8 +7,9 @@ are frozen (gate 1 of the plan); what happens inside grows module by module.
     index_source(obj, path=None, text=None) -> int (chunks)  (Module 2, live)
     remove_source(obj)                  -> None              (Module 2, live)
     ask(question, user=None)            -> dict              (Module 2, live)
-    build_outreach_kit(resource_id)     -> int  (kit id)     (Module 3)
-    kit_status(kit_id)                  -> str               (Module 3)
+    build_outreach_kit(resource, user=None) -> int (kit id)  (Module 3, live)
+    kit_status(kit_id)                  -> str               (Module 3, live)
+    published_kits(limit=6)             -> list[OutreachKit] (Module 3, live)
     suggest_next_resources(user)        -> list[int]         (Module 4)
 
 Until a function's module lands it returns sample data of the final shape,
@@ -70,14 +71,32 @@ def ask(question: str, user=None) -> dict[str, Any]:
     return ask_pipeline.ask(question, user).as_dict()
 
 
-def build_outreach_kit(resource_id: int) -> int:
-    """Queue the Outreach Studio fan-out for a resource; returns the kit id."""
-    return 0
+# --- Module 3 -----------------------------------------------------------------
+def build_outreach_kit(resource, user=None) -> int:
+    """Start making an outreach kit from an indexed resource, in the background.
+    Returns the kit id at once; poll kit_status(kit_id). Index the resource first."""
+    from outreach_studio.tasks import start_kit
+
+    return start_kit(resource, user).pk
 
 
 def kit_status(kit_id: int) -> str:
     """One of: queued, running, review, published, failed."""
-    return "queued"
+    from outreach_studio.models import OutreachKit
+
+    return OutreachKit.objects.values_list("status", flat=True).get(pk=kit_id)
+
+
+def published_kits(limit: int = 6):
+    """Newest published kits, for the media portal homepage. Each has title, published_at,
+    get_absolute_url() and kit.item("summary").content["points"]."""
+    from outreach_studio.models import OutreachKit
+
+    return list(
+        OutreachKit.objects.filter(status=OutreachKit.Status.PUBLISHED)
+        .prefetch_related("items")
+        .order_by("-published_at")[:limit]
+    )
 
 
 def suggest_next_resources(user) -> list[int]:

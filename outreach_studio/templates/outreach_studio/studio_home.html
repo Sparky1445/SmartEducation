@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load ui humanize %}
+
+{% block title %}Outreach studio{% endblock %}
+{% block lede %}Turn any lesson in the repository into study notes, a quiz, an article, social posts and three translations. Review each part, then publish it to the Learn page.{% endblock %}
+
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Lessons" lessons|length|stringformat:"d"|add:" ready" %}
+      {% if lessons %}
+      <ul class="roster">
+        {% for l in lessons %}
+        <li>
+          <span class="roster__dot {% if l.has_kit %}is-ready{% endif %}"></span>
+          <span class="roster__name">{{ l.title|truncatechars:48 }}<span class="roster__duty">{{ l.chunks }} passage{{ l.chunks|pluralize }} · {{ l.ct_label }}{% if l.has_kit %} · has a kit{% endif %}</span></span>
+          <form method="post" action="{% url 'outreach_studio:kit_create' l.content_type l.object_id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--quiet">{% if l.has_kit %}New kit{% else %}Make kit{% endif %}</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <p class="note">No lessons yet. Upload a PDF, PowerPoint or text file to the repository and it will appear here.</p>
+      {% endif %}
+    </section>
+  </aside>
+
+  <div class="split__main">
+    <section>
+      {% section_head "Kits" "" %}
+      <nav class="filters">
+        <a href="?" class="{% if not status %}is-active{% endif %}">All</a>
+        {% for value, label in statuses %}
+          <a href="?status={{ value }}" class="{% if status == value %}is-active{% endif %}">{{ label }}{% for k, n in counts.items %}{% if k == value %} · {{ n }}{% endif %}{% endfor %}</a>
+        {% endfor %}
+      </nav>
+      <table class="ledger">
+        <thead><tr><th>Kit</th><th>Lesson</th><th>Status</th><th class="num">Approved</th><th class="num">Made</th></tr></thead>
+        <tbody>
+          {% for kit in kits %}
+          <tr>
+            <td><a href="{% url 'outreach_studio:kit' kit.pk %}">{{ kit|truncatechars:50 }}</a></td>
+            <td class="muted">{{ kit.source_title|truncatechars:36 }}</td>
+            <td><span class="tag {% if kit.status == 'published' %}tag--solid{% elif kit.status == 'review' %}tag--ok{% elif kit.status == 'failed' %}tag--err{% else %}tag--live{% endif %}">{{ kit.get_status_display }}</span></td>
+            <td class="num">{{ kit.n_approved }} / {{ kit.n_items }}</td>
+            <td class="num">{{ kit.created_at|naturaltime }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="ledger__empty">No kits yet. Pick a lesson on the left and press “Make kit”.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>
+{% endblock %}

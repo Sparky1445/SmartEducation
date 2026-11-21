@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "core",
     "ai_engine",  # internal only: no public pages
     "ask",
+    "outreach_studio",
     # --- Suhaib (add as each app lands) ---
     # "accounts",
     # "repository",
@@ -131,6 +132,9 @@ AI_ENGINE = {
 
 # Answers whose source match is below this are replaced by "not in the repository".
 ASK_TRUST_THRESHOLD = int(os.getenv("ASK_TRUST_THRESHOLD", "55"))
+
+# Outreach kits are made in a background thread; tests set this True to run inline.
+OUTREACH_RUN_INLINE = False
 
 # --- Logging (Unit III: debugging) -------------------------------------------
 LOG_DIR = BASE_DIR / "logs"

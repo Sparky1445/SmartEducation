@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Learn{% endblock %}
+{% block lede %}Lessons from our teachers, ready to revise: key points, a short read, a self-check quiz and flashcards, in English, Hindi, Marathi and Konkani.{% endblock %}
+
+{% block content %}
+<div class="stack">
+  {% section_head "Learn" page_obj.paginator.count|stringformat:"d"|add:" lessons" %}
+  {% if kits %}
+  <div class="tiles">
+    {% for kit in kits %}
+    <a class="tile" href="{{ kit.get_absolute_url }}">
+      <span class="label label--accent">{{ kit.published_at|date:"d M Y" }}</span>
+      <span class="tile__title">{{ kit.title }}</span>
+      {% for item in kit.items.all %}{% if item.kind == "summary" and item.approved %}
+        <span class="tile__text">{{ item.content.points.0|truncatechars:140 }}</span>
+      {% endif %}{% endfor %}
+      <span class="tile__meta">
+        {% for item in kit.items.all %}{% if item.approved %}{% if item.kind == "quiz" %}quiz · {% elif item.kind == "translation" %}{{ item.language }} · {% endif %}{% endif %}{% endfor %}read &rarr;
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+  {% if page_obj.has_other_pages %}
+  <nav class="filters" style="margin-top: 24px;">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">&larr; Newer</a>{% endif %}
+    <span class="label">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Older &rarr;</a>{% endif %}
+  </nav>
+  {% endif %}
+  {% else %}
+    <p class="answer--empty display">Nothing published yet.<br><em>Check back soon.</em></p>
+  {% endif %}
+</div>
+{% endblock %}

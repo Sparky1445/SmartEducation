@@ -6,7 +6,7 @@
   <title>{% block title %}Smart Education{% endblock %} · Smart Education</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/smartedu.css' %}">
   {% block head %}{% endblock %}
 </head>
@@ -29,9 +29,10 @@
     {% with section=request.resolver_match.app_name %}
     <span class="is-soon" title="Coming soon">Repository</span>
     <a href="{% url 'ask:home' %}" class="{% if section == 'ask' %}is-active{% endif %}">Ask</a>
-    <span class="is-soon" title="Coming soon">Outreach studio</span>
+    <a href="{% url 'outreach_studio:learn' %}" class="{% if request.resolver_match.url_name == 'learn' or request.resolver_match.url_name == 'learn_kit' %}is-active{% endif %}">Learn</a>
     <span class="is-soon" title="Coming soon">Media</span>
     <span class="nav__spacer"></span>
+    {% if perms.outreach_studio.add_outreachkit %}<a href="{% url 'outreach_studio:studio' %}" class="{% if section == 'outreach_studio' and 'studio' in request.path %}is-active{% endif %}">Studio</a>{% endif %}
     {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin</a>{% endif %}
     {% endwith %}
   </nav>
@@ -50,6 +51,7 @@
     <span>{% block footer_meta %}Dhargal · North Goa{% endblock %}</span>
   </footer>
 </div>
+<script src="{% static 'js/smartedu.js' %}" defer></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>
