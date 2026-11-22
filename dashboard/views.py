@@ -10,7 +10,7 @@ from django.views.generic import TemplateView
 
 from ai_engine import services
 from ask.models import ChatQuery
-from repository.models import Bookmark
+from repository.models import Bookmark, Resource
 from engagement.models import Comment, Feedback, NewsletterSubscriber
 from outreach_studio.models import OutreachKit
 
@@ -41,8 +41,10 @@ class StudentDashboardView(LoginRequiredMixin, TemplateView):
         recent_ids = self.request.session.get("recent_kits", [])
         recent = OutreachKit.objects.filter(pk__in=recent_ids, status=OutreachKit.Status.PUBLISHED)
         recent = sorted(recent, key=lambda k: recent_ids.index(k.pk))
+        grade = getattr(getattr(user, "profile", None), "grade", None)
         ctx.update(
             {
+                "class_label": f"For class {grade}" if grade else "",
                 "questions": mine[:6],
                 "asked": agg["total"],
                 "found_pct": round(100 * agg["found"] / agg["total"]) if agg["total"] else 0,
@@ -50,6 +52,8 @@ class StudentDashboardView(LoginRequiredMixin, TemplateView):
                 "up_next": services.suggest_next_kits(user, limit=4, exclude=recent_ids),
                 "comments": Comment.objects.filter(user=user).select_related("content_type")[:5],
                 "comment_count": Comment.objects.filter(user=user).count(),
+                "grade": grade,
+                "for_class": Resource.objects.published().filter(grade=grade).select_related("subject")[:4] if grade else [],
                 "bookmarks": Bookmark.objects.filter(user=user, resource__status="published").select_related("resource__subject")[:4],
                 "subscription": NewsletterSubscriber.objects.filter(email__iexact=user.email, is_active=True).first() if user.email else None,
             }

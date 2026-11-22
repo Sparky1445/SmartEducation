@@ -46,6 +46,18 @@
       {% endif %}
     </section>
 
+    {% if grade %}
+    <section>
+      {% section_head class_label "newest lessons" %}
+      {% if for_class %}
+        <div class="tiles tiles--compact">{% for r in for_class %}{% include "repository/_card.html" %}{% endfor %}</div>
+        <p class="small" style="margin-top: 10px;"><a href="{% url 'repository:list' %}?grade={{ grade }}">All class {{ grade }} lessons</a></p>
+      {% else %}<p class="muted small">No lessons for class {{ grade }} yet.</p>{% endif %}
+    </section>
+    {% else %}
+    <p class="note">Add your class on <a href="{% url 'accounts:profile' %}">your profile</a> to see lessons for it here.</p>
+    {% endif %}
+
     {% if bookmarks %}
     <section>
       {% section_head "Bookmarks" "" %}

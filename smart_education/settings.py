@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     "engagement",
     "dashboard",
     "repository",
+    "accounts",
     # --- Suhaib (add as each app lands) ---
-    # "accounts",
     # "media_portal",
     # "courses",
 ]
@@ -120,7 +120,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # PDFs open inside the lesson page (same site only).
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
-LOGIN_URL = "login"  # Suhaib's accounts app can take this name over
+LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "dashboard:home"
 LOGOUT_REDIRECT_URL = "home"
 
@@ -178,3 +178,12 @@ LOGGING = {
 
 # Uploads above this size are streamed to a temp file instead of memory.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024
+
+# Password reset emails: printed to the terminal in development. Set EMAIL_* in .env for real mail.
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "Smart Education <no-reply@smarteducation.local>")

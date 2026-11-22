@@ -10,13 +10,16 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
 
+from accounts.urls import auth_urlpatterns
+
 admin.site.site_header = "Smart Education · Admin"
 admin.site.site_title = "Smart Education"
 admin.site.index_title = "Site administration"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("accounts/", include("django.contrib.auth.urls")),  # login/logout until Suhaib's accounts app lands
+    path("accounts/", include(auth_urlpatterns)),  # login (remember me), logout, password change/reset
+    path("accounts/", include("accounts.urls")),  # signup, profile
     path("ask/", include("ask.urls")),
     path("repository/", include("repository.urls")),
     path("dashboard/", include("dashboard.urls")),

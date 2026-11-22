@@ -22,4 +22,5 @@ class Command(BaseCommand):
         group, created = Group.objects.get_or_create(name="Teacher")
         perms = [Permission.objects.get(content_type__app_label=app, codename=code) for app, code in TEACHER]
         group.permissions.set(perms)
-        self.stdout.write(self.style.SUCCESS(f"{'Created' if created else 'Updated'} Teacher group with {len(perms)} permissions."))
+        Group.objects.get_or_create(name="Student")  # students need no extra permissions
+        self.stdout.write(self.style.SUCCESS(f"{'Created' if created else 'Updated'} Teacher group with {len(perms)} permissions, and a Student group."))

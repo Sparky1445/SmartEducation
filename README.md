@@ -1,7 +1,7 @@
 # Smart Education
 
 A Django knowledge repository and outreach/media portal with an agentic AI engine (INT253, 2026–27).
-Team: Atharwa (AI engine, `ask`, `outreach_studio`, `engagement`, `dashboard`, `repository`) · Suhaib (`accounts`, `media_portal`, `courses`).
+Team: Atharwa (AI engine, `ask`, `outreach_studio`, `engagement`, `dashboard`, `repository`, `accounts`) · Suhaib (`media_portal`, `courses`).
 
 ## Run it (Windows)
 
@@ -108,7 +108,6 @@ Results are cached per topic for 24 h (`WebLookup` in the admin). `python manage
 | Learn lesson pages | Star rating and a comment thread (`{% load engagement_tags %}{% rating_for obj %}{% comments_for obj %}`) |
 | `/dashboard/` | Sends students to `/dashboard/me/` and teachers to `/dashboard/teacher/` |
 | Footer "Dark mode", dashboard Preferences | Theme and preferred language, stored in cookies (`se_theme`, `se_lang`) |
-| `/accounts/login/` | Temporary login page until Suhaib's `accounts` app takes over |
 
 Suhaib: to allow comments and ratings on your models, add them to `ALLOWED_TARGETS` in
 `engagement/views.py`, e.g. `("repository", "resource")`, then use the two template tags on the detail page.
@@ -127,3 +126,14 @@ Uploading or editing a published lesson indexes it automatically (signals), so t
 from it and Outreach Studio can make a kit. PDF, PPTX, TXT and MD files are read; for videos and links
 the title, description and tags are searchable. Drafts are hidden and not searchable.
 Ten subjects are created by a migration; add more in the admin.
+
+## Accounts (Module 6)
+
+| URL | What |
+| --- | --- |
+| `/accounts/signup/` | Students, parents and visitors sign up (teachers are added by the school, then put in the Teacher group) |
+| `/accounts/login/` | Log in; "Keep me logged in" keeps the session for 2 weeks, otherwise it ends when the browser closes |
+| `/accounts/profile/` | Name, email, class, school, preferred language |
+| `/accounts/password_change/`, `/accounts/password_reset/` | Django's password views, styled. Reset emails print in the terminal unless `EMAIL_*` is set in `.env` |
+
+Every user gets a `Profile` automatically (signal); a migration creates one for users that already existed.

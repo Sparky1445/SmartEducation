@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Create an account{% endblock %}
+{% block lede %}Save lessons, join discussions and get suggestions for your class. Teachers get their accounts from the school.{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "With an account you can" "" %}
+      <ul class="points">
+        <li>Bookmark lessons and come back to them on any device.</li>
+        <li>Rate lessons and ask doubts in the discussion.</li>
+        <li>See lessons picked for your class and your questions.</li>
+      </ul>
+      <p class="small">Already have one? <a href="{% url 'login' %}">Log in</a>.</p>
+    </section>
+  </aside>
+  <div class="split__main">
+    <section>
+      {% section_head "Create an account" "" %}
+      <form method="post" class="stack-form" novalidate>
+        {% csrf_token %}
+        {% for error in form.non_field_errors %}<p class="note note--error">{{ error }}</p>{% endfor %}
+        <fieldset class="field">
+          <legend class="label">{{ form.role.label }}</legend>
+          <div class="seg seg--radio">{% for radio in form.role %}<label>{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}</div>
+        </fieldset>
+        {% for field in form %}{% if field.name != "role" %}
+          <label class="field" {% if field.name == "grade" %}data-grade{% endif %}>
+            <span class="label">{{ field.label }}</span>{{ field }}
+            {% if field.help_text and field.name != "password1" %}<span class="small muted">{{ field.help_text|safe }}</span>{% endif %}
+            {% if field.name == "password1" %}<span class="small muted">At least 8 characters. Not only numbers, and not too close to your name.</span>{% endif %}
+            {% for error in field.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+          </label>
+        {% endif %}{% endfor %}
+        <button type="submit" class="btn btn--primary">Create account</button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  // Only students choose a class.
+  (function () {
+    var box = document.querySelector("[data-grade]");
+    function sync() {
+      var chosen = document.querySelector("input[name=role]:checked");
+      box.hidden = !chosen || chosen.value !== "student";
+    }
+    document.querySelectorAll("input[name=role]").forEach(function (r) { r.addEventListener("change", sync); });
+    sync();
+  })();
+</script>
+{% endblock %}

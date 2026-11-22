@@ -1,0 +1,16 @@
+{% load ui %}
+<section class="narrow">
+  {% section_head heading "" %}
+  {% if intro %}<p class="muted" style="margin-top: 0;">{{ intro }}</p>{% endif %}
+  <form method="post" class="stack-form" novalidate>
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}<p class="note note--error">{{ error }}</p>{% endfor %}
+    {% for field in form %}
+      <label class="field">
+        <span class="label">{{ field.label }}</span>{{ field }}
+        {% for error in field.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+      </label>
+    {% endfor %}
+    <button type="submit" class="btn btn--primary">{{ button }}</button>
+  </form>
+</section>

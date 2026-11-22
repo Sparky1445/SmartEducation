@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Your profile{% endblock %}
+{% block lede %}Your name, class and preferred language. The class is used to suggest lessons.{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head prof.display_name prof.get_role_display %}
+      <dl class="kv">
+        <dt>Username</dt><dd class="mono">{{ user.username }}</dd>
+        <dt>Joined</dt><dd class="mono">{{ user.date_joined|date:"d M Y" }}</dd>
+        {% if user.groups.all %}<dt>Groups</dt><dd>{{ user.groups.all|join:", " }}</dd>{% endif %}
+      </dl>
+    </section>
+    <section class="actions">
+      <a class="btn btn--quiet" href="{% url 'password_change' %}">Change password</a>
+      <a class="btn btn--quiet" href="{% url 'dashboard:home' %}">Dashboard</a>
+    </section>
+  </aside>
+  <div class="split__main">
+    <section>
+      {% section_head "Edit profile" "" %}
+      <form method="post" class="stack-form" novalidate>
+        {% csrf_token %}
+        {% for field in user_form %}
+          <label class="field"><span class="label">{{ field.label }}</span>{{ field }}{% for e in field.errors %}<span class="field__error">{{ e }}</span>{% endfor %}</label>
+        {% endfor %}
+        {% for field in profile_form %}
+          {% if field.name != "grade" or prof.role == "student" %}
+          <label class="field"><span class="label">{{ field.label }}</span>{{ field }}{% for e in field.errors %}<span class="field__error">{{ e }}</span>{% endfor %}</label>
+          {% endif %}
+        {% endfor %}
+        {% for e in profile_form.non_field_errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+        <button type="submit" class="btn btn--primary">Save profile</button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

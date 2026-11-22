@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Log in{% endblock %}
+{% block lede %}Log in to comment, rate and bookmark lessons, and to see your dashboard.{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "New here?" "" %}
+      <p class="small">Students and parents can make an account in a minute.</p>
+      <a class="btn" href="{% url 'accounts:signup' %}">Create an account</a>
+    </section>
+  </aside>
+  <div class="split__main">
+    <section>
+      {% section_head "Log in" "" %}
+      <form method="post" class="stack-form" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<p class="note note--error">Username and password didn't match. Check both and try again.</p>{% endif %}
+        <label class="field"><span class="label">Username</span>{{ form.username }}</label>
+        <label class="field"><span class="label">Password</span>{{ form.password }}</label>
+        <label class="check">{{ form.remember }} <span>{{ form.remember.label }}</span></label>
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" class="btn btn--primary">Log in</button>
+      </form>
+      <p class="small" style="margin-top: 16px;"><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
+    </section>
+  </div>
+</div>
+{% endblock %}

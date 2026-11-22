@@ -448,3 +448,19 @@ button.quiz__opt:hover { border-color: var(--ink); }
 .embed-img { display: block; max-width: 100%; margin-top: 18px; border: 1px solid var(--rule); }
 .field-file { font-size: 13px; padding: 10px 0; }
 .stack-form select.field-input { padding: 12px 14px; }
+
+/* ---------- Accounts ---------- */
+.narrow { max-width: 620px; margin-top: 34px; }
+.stack-form input[type=text], .stack-form input[type=password], .stack-form input[type=email] {
+  width: 100%; background: var(--paper-raised); border: 1px solid var(--ink); padding: 14px 16px; font-size: 15px; color: var(--ink); outline: none; border-radius: 0;
+}
+.stack-form input:focus { border-color: var(--accent); }
+fieldset.field { border: 0; padding: 0; margin: 0; }
+fieldset.field legend { margin-bottom: 8px; }
+.seg--radio label { display: inline-flex; align-items: center; cursor: pointer; border-right: 1px solid var(--rule); }
+.seg--radio label:last-child { border-right: 0; }
+.seg--radio input { position: absolute; opacity: 0; pointer-events: none; }
+.seg--radio span { padding: 9px 14px; font-size: 13px; }
+.seg--radio input:checked + span { background: var(--ink); color: var(--paper); }
+.seg--radio input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: -2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
