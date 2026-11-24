@@ -27,7 +27,7 @@ class AgentSpec:
         return self.module <= CURRENT_MODULE
 
 
-CURRENT_MODULE = 3
+CURRENT_MODULE = 5
 
 ROSTER: tuple[AgentSpec, ...] = (
     AgentSpec(
@@ -58,6 +58,15 @@ ROSTER: tuple[AgentSpec, ...] = (
         "statement in the answer is supported by the sources (100 = every claim is stated in the sources, "
         "0 = none are). Reply with JSON only, no code fence: {\"score\": <int>, \"reason\": \"<one sentence>\"}",
         2,
+    ),
+    AgentSpec(
+        "Tutor", "ask", "Step 2: answers from general knowledge when the repository has nothing.",
+        "ROLE: Tutor.\nYou are a friendly tutor for school students (classes 5 to 12) in Goa, India. "
+        "The school's own lessons do not cover this question, so answer from your general knowledge. "
+        "Write 3 to 6 short, accurate sentences in simple English, following the Indian school syllabus "
+        "where it applies. If you are not sure of a fact, say so. Do not include links. If the question "
+        "is not suitable for a school student, politely decline and suggest asking a teacher.",
+        5,
     ),
     AgentSpec(
         "Summariser", "outreach", "Key points of a resource.",

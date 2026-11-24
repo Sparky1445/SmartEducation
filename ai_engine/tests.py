@@ -50,7 +50,7 @@ class PingServiceTests(TestCase):
     def test_contract_shapes(self):
         result = services.ask("What is osmosis?")
         self.assertEqual(
-            set(result), {"answer", "citations", "trust_score", "in_repository", "run_id", "search_query"}
+            set(result), {"answer", "citations", "trust_score", "in_repository", "run_id", "search_query", "answer_kind"}
         )
         self.assertEqual(services.suggest_next_resources(None), [])
 

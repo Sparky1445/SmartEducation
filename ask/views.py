@@ -60,6 +60,7 @@ def ask_page(request):
                 citations=result["citations"],
                 trust_score=result["trust_score"],
                 in_repository=result["in_repository"],
+                answer_kind=result.get("answer_kind", "none"),
                 run_id=result["run_id"],
                 web_links=web,
             )

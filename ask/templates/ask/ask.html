@@ -2,7 +2,7 @@
 {% load ui ask_tags humanize %}
 
 {% block title %}Ask{% endblock %}
-{% block lede %}Ask anything about the lessons in the repository. Every answer comes only from material our teachers have uploaded, and shows exactly where it came from.{% endblock %}
+{% block lede %}Ask anything. Answers from our teachers' lessons come first and show where they came from; anything else gets a clearly marked general answer.{% endblock %}
 
 {% block content %}
 <div class="split">
@@ -15,7 +15,7 @@
           {% for item in history %}
           <li class="{% if current and item.pk == current.pk %}is-current{% endif %}">
             <a href="?q={{ item.pk }}#answer">{{ item.question|truncatechars:70 }}</a>
-            <span class="qlist__meta">{% if item.in_repository %}{{ item.source_count }} source{{ item.source_count|pluralize }}{% else %}not found{% endif %} · {{ item.created_at|naturaltime }}</span>
+            <span class="qlist__meta">{% if item.in_repository %}{{ item.source_count }} source{{ item.source_count|pluralize }}{% elif item.answer_kind == "general" %}general answer{% else %}not found{% endif %} · {{ item.created_at|naturaltime }}</span>
           </li>
           {% endfor %}
         </ol>
@@ -30,7 +30,7 @@
 
     <section>
       {% section_head "Good to know" "" %}
-      <p class="note">Answers come only from the repository. Videos and websites from the open web are listed separately under each answer. If a topic is missing, we pass your question to the teachers.</p>
+      <p class="note">Answers come from the repository first, with sources. If no lesson covers your question, you get a general answer, clearly marked, and we pass the topic to the teachers.</p>
     </section>
   </aside>
 
@@ -80,6 +80,12 @@
           </li>
           {% endfor %}
         </ol>
+      {% elif current.answer_kind == "general" %}
+        <div class="answer__general">
+          <p class="label">General answer · not from our lessons</p>
+          <div class="answer__body">{{ current.answer|linebreaksbr }}</div>
+        </div>
+        <p class="small muted" style="margin-top: 12px;">No lesson in the repository covers this yet, so this answer was written by AI and has no sources to check. We've passed the topic to the teachers. <a href="{% url 'engagement:feedback' %}?topic={{ current.question|urlencode }}&from={{ request.path|urlencode }}">Request a lesson on it</a>.</p>
       {% else %}
         <div class="answer__missing">
           <p class="label label--accent">Not in the repository yet</p>

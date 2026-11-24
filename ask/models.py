@@ -14,6 +14,10 @@ class ChatQuery(models.Model):
     citations = models.JSONField(default=list, blank=True)
     trust_score = models.PositiveSmallIntegerField(default=0)
     in_repository = models.BooleanField(default=False, db_index=True)
+    answer_kind = models.CharField(
+        max_length=10, default="none",
+        choices=[("repository", "From the repository"), ("general", "General answer"), ("none", "No answer")],
+    )
     web_links = models.JSONField(default=dict, blank=True, help_text="Related videos and websites shown under the answer.")
     helpful = models.BooleanField(null=True, blank=True, help_text="Student feedback: was this answer useful?")
     run = models.ForeignKey("ai_engine.AgentRun", null=True, blank=True, on_delete=models.SET_NULL)

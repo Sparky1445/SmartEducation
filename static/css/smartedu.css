@@ -511,3 +511,7 @@ fieldset.field legend { margin-bottom: 8px; }
 .score--pass { color: var(--accent); }
 .gaps__q { font-size: 14px; }
 .report .gaps__row, .gaps__row:has(.gaps__q) { grid-template-columns: minmax(0, 1.3fr) 1fr auto; }
+
+.answer__general { border-left: 2px solid var(--ink); background: var(--panel); padding: 14px 16px; max-width: 68ch; }
+.answer__general .label { margin: 0 0 8px; }
+.answer__general .answer__body { font-size: 16px; }

@@ -69,7 +69,8 @@ def ask(question: str, user=None) -> dict[str, Any]:
     """Answer from the repository only.
     Returns {"answer": str, "citations": [{"n", "title", "url", "locator", "excerpt",
     "content_type", "object_id", "resource_id"}], "trust_score": 0-100, "in_repository": bool, "run_id": int,
-    "search_query": str (short topic keywords, good for related_links)}
+    "search_query": str (short topic keywords, good for related_links),
+    "answer_kind": "repository" (from lessons, with citations) | "general" (LLM answer, not from lessons) | "none"}
     When the repository has no good answer, in_repository is False and answer is a polite fallback."""
     return ask_pipeline.ask(question, user).as_dict()
 

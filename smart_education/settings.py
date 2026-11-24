@@ -142,6 +142,8 @@ AI_ENGINE = {
 
 # Answers whose source match is below this are replaced by "not in the repository".
 ASK_TRUST_THRESHOLD = int(os.getenv("ASK_TRUST_THRESHOLD", "55"))
+# When the repository has no answer, the LLM gives a general answer (clearly labelled).
+ASK_GENERAL_FALLBACK = env_bool("ASK_GENERAL_FALLBACK", True)
 
 # Related videos and websites under every answer. Both keys are optional:
 # without them the page shows Wikipedia articles and search links.

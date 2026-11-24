@@ -42,6 +42,7 @@ class AskResult:
     in_repository: bool = False
     run_id: int | None = None
     search_query: str = ""
+    answer_kind: str = "none"  # "repository" | "general" | "none"
 
     def as_dict(self) -> dict:
         return {
@@ -51,6 +52,7 @@ class AskResult:
             "in_repository": self.in_repository,
             "run_id": self.run_id,
             "search_query": self.search_query,
+            "answer_kind": self.answer_kind,
         }
 
 
@@ -189,13 +191,45 @@ def _pipeline(question: str, rec, loop: EventLoop) -> AskResult:
                 "excerpt": h.chunk.text[:220],
             }
         )
-    return AskResult(answer, citations, trust, True)
+    return AskResult(answer, citations, trust, True, answer_kind="repository")
+
+
+def general_fallback_enabled() -> bool:
+    return bool(getattr(settings, "ASK_GENERAL_FALLBACK", True))
+
+
+@mock_responder("Tutor")
+def _mock_tutor(user_text: str, history: ChatHistory) -> str:
+    return (
+        f"Here is a short general answer to \u201c{user_text[:120]}\u201d. "
+        "(Offline demo: connect an AI provider in .env for a real explanation.)"
+    )
+
+
+def _general_answer(question: str, rec, loop: EventLoop, service) -> str:
+    """Step 2: the repository had nothing reliable, so the LLM answers from its own knowledge."""
+    tutor = build_agent("Tutor", service)
+    reply = loop.run(tutor.get_response(messages=question))
+    rec.add_tokens(reply.message.metadata.get("usage"))
+    text = str(reply.message.content).strip()
+    rec.step("Tutor", "general", text)
+    return text
 
 
 def ask(question: str, user=None) -> AskResult:
+    """1) RAG over the repository (Retriever -> search -> Answerer -> Verifier).
+    2) If the repository has no reliable answer, the Tutor agent answers with the LLM,
+       clearly marked as a general answer. The question still counts as a gap for teachers."""
     with tracked_run(AgentRun.Pipeline.ASK, question, user) as rec:
         with EventLoop() as loop:
             result = _pipeline(question, rec, loop)
+            if not result.in_repository and general_fallback_enabled():
+                try:
+                    text = _general_answer(question, rec, loop, get_chat_service())
+                except Exception:  # noqa: BLE001 - keep the polite fallback if the LLM is down
+                    text = ""
+                if text:
+                    result.answer, result.answer_kind = text, "general"
         result.search_query = rec.run.trace[0]["text"] if rec.run.trace else question
         result.run_id = rec.run.pk
         rec.run.output = result.as_dict()

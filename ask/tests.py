@@ -111,17 +111,35 @@ class PipelineTests(TestCase):
         run = AgentRun.objects.get(pk=result["run_id"])
         self.assertEqual([s["agent"] for s in run.trace], ["Retriever", "Search", "Answerer", "Verifier"])
 
-    def test_fallback_when_not_in_repository(self):
+    def test_general_answer_when_not_in_repository(self):
         result = services.ask("Who won the cricket world cup in 2011?")
         self.assertFalse(result["in_repository"])
-        self.assertEqual(result["answer"], FALLBACK_ANSWER)
+        self.assertEqual(result["answer_kind"], "general")
+        self.assertIn("general answer", result["answer"])
         self.assertEqual(result["citations"], [])
+        run = AgentRun.objects.get(pk=result["run_id"])
+        self.assertEqual(run.trace[-1]["agent"], "Tutor")
+
+    def test_repository_answer_does_not_call_the_tutor(self):
+        result = services.ask("What is condensation in the water cycle?")
+        self.assertEqual(result["answer_kind"], "repository")
+        run = AgentRun.objects.get(pk=result["run_id"])
+        self.assertNotIn("Tutor", [s["agent"] for s in run.trace])
+
+    def test_polite_fallback_when_general_answers_are_off(self):
+        with self.settings(ASK_GENERAL_FALLBACK=False):
+            result = services.ask("Who won the cricket world cup in 2011?")
+        self.assertEqual((result["answer"], result["answer_kind"]), (FALLBACK_ANSWER, "none"))
 
     def test_unanswered_question_still_gets_web_links(self):
         self.client.post(reverse("ask:home"), {"question": "Who won the cricket world cup in 2011?"})
         query = ChatQuery.objects.get()
         self.assertFalse(query.in_repository)
+        self.assertEqual(query.answer_kind, "general")
         self.assertTrue(query.web_links["more"])
+        page = self.client.get(f"{reverse('ask:home')}?q={query.pk}")
+        self.assertContains(page, "General answer")
+        self.assertContains(page, "Request a lesson on it")
 
     def test_low_trust_is_rejected(self):
         with self.settings(ASK_TRUST_THRESHOLD=101):
