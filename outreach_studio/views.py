@@ -11,6 +11,8 @@ from django.views.generic import ListView
 
 from ai_engine.models import DocumentChunk
 
+from courses.forms import QuizFromKitForm
+
 from .forms import form_for
 from .models import KitItem, OutreachKit
 from .tasks import start_kit
@@ -100,6 +102,7 @@ def kit_detail(request, pk: int):
             "approved": approved,
             "total": len(items),
             "can_publish": request.user.has_perm(PUBLISH_PERM),
+            "topic_form": QuizFromKitForm(),
         },
     )
 
@@ -214,4 +217,5 @@ def learn_kit(request, pk: int, slug: str):
     by_kind = {}
     for item in items:
         by_kind.setdefault(item.kind, []).append(item)
-    return render(request, "outreach_studio/learn_kit.html", {"kit": kit, "by_kind": by_kind})
+    scored = kit.quizzes.filter(is_published=True).first()
+    return render(request, "outreach_studio/learn_kit.html", {"kit": kit, "by_kind": by_kind, "scored_quiz": scored})

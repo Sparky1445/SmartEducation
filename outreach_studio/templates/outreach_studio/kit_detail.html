@@ -33,6 +33,15 @@
         {% elif kit.status == 'review' and can_publish %}
           <form method="post" action="{% url 'outreach_studio:kit_publish' kit.pk %}">{% csrf_token %}<button class="btn btn--primary">Publish approved parts</button></form>
         {% endif %}
+        {% if perms.courses.add_quiz %}
+        <form method="post" action="{% url 'courses:from_kit' kit.pk %}" class="actions">
+          {% csrf_token %}{{ topic_form.topic }}
+          <button class="btn btn--quiet">Make scored quiz</button>
+        </form>
+        {% endif %}
+        {% if perms.media_portal.add_article %}
+        <form method="post" action="{% url 'media_portal:from_kit' kit.pk %}">{% csrf_token %}<button class="btn btn--quiet">Send article to News</button></form>
+        {% endif %}
         <form method="post" action="{% url 'outreach_studio:kit_regenerate' kit.pk %}">{% csrf_token %}<button class="btn btn--quiet">Make a fresh kit</button></form>
       </div>
     </section>

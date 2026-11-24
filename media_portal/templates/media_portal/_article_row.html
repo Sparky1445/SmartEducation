@@ -1,0 +1,5 @@
+<li class="newsrow">
+  <a href="{{ a.get_absolute_url }}" class="newsrow__title">{{ a.title }}</a>
+  {% if a.standfirst %}<p class="newsrow__text">{{ a.standfirst|truncatechars:160 }}</p>{% endif %}
+  <span class="qlist__meta">{{ a.get_category_display }} · {{ a.published_at|date:"d M Y" }} · {{ a.reading_minutes }} min read</span>
+</li>

@@ -8,9 +8,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import TemplateView
 
 from accounts.urls import auth_urlpatterns
+from media_portal import views as media_views
 
 admin.site.site_header = "Smart Education · Admin"
 admin.site.site_title = "Smart Education"
@@ -22,11 +22,12 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),  # signup, profile
     path("ask/", include("ask.urls")),
     path("repository/", include("repository.urls")),
+    path("courses/", include("courses.urls")),
     path("dashboard/", include("dashboard.urls")),
     path("", include("engagement.urls")),
     path("", include("outreach_studio.urls")),
-    # Suhaib's apps plug in here, e.g. path("", include("media_portal.urls")),
-    path("", TemplateView.as_view(template_name="core/home.html"), name="home"),
+    path("", include("media_portal.urls")),
+    path("", media_views.home, name="home"),
 ]
 
 if settings.DEBUG:

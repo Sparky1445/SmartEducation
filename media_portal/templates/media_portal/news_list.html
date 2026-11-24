@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}News{% endblock %}
+{% block lede %}School news, notices, achievements and stories from our classrooms.{% endblock %}
+{% block head %}<link rel="alternate" type="application/rss+xml" title="Smart Education news" href="{% url 'media_portal:feed' %}">{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Sections" "" %}
+      <ul class="roster">
+        <li><span class="roster__dot {% if not category %}is-ready{% endif %}"></span><span class="roster__name"><a href="{{ request.path }}">Everything</a></span><span></span></li>
+        {% for value, label in categories %}<li><span class="roster__dot {% if category == value %}is-ready{% endif %}"></span><span class="roster__name"><a href="?category={{ value }}">{{ label }}</a></span><span></span></li>{% endfor %}
+      </ul>
+    </section>
+    {% if years %}
+    <section>
+      {% section_head "Archive" "" %}
+      <div class="chips">{% for y in years %}<a class="chip" href="{% url 'media_portal:news_year' y.year %}">{{ y.year }}</a>{% endfor %}</div>
+      <p class="small" style="margin-top: 14px;"><a href="{% url 'media_portal:feed' %}">RSS feed</a></p>
+    </section>
+    {% endif %}
+  </aside>
+  <div class="split__main">
+    <section>
+      {% section_head year|default_if_none:"Latest" page_obj.paginator.count|stringformat:"d"|add:" stories" %}
+      {% if articles %}
+        <ul class="newslist">{% for a in articles %}{% include "media_portal/_article_row.html" %}{% endfor %}</ul>
+      {% else %}<p class="muted">No stories here yet.</p>{% endif %}
+      {% if page_obj.has_other_pages %}
+      <nav class="filters" style="margin-top: 24px;">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if category %}&category={{ category }}{% endif %}">&larr; Newer</a>{% endif %}
+        <span class="label">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if category %}&category={{ category }}{% endif %}">Older &rarr;</a>{% endif %}
+      </nav>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -12,6 +12,12 @@ TEACHER = [
     ("repository", "add_tag"), ("outreach_studio", "add_outreachkit"), ("outreach_studio", "change_outreachkit"),
     ("outreach_studio", "publish_outreachkit"), ("engagement", "change_comment"), ("engagement", "delete_comment"),
     ("engagement", "view_feedback"), ("engagement", "change_feedback"),
+    ("media_portal", "add_article"), ("media_portal", "change_article"), ("media_portal", "view_article"),
+    ("media_portal", "add_event"), ("media_portal", "change_event"), ("media_portal", "view_event"),
+    ("courses", "add_unit"), ("courses", "change_unit"), ("courses", "view_unit"),
+    ("courses", "add_topic"), ("courses", "change_topic"), ("courses", "view_topic"),
+    ("courses", "add_quiz"), ("courses", "change_quiz"), ("courses", "view_quiz"), ("courses", "view_quizattempt"),
+    ("media_portal", "add_announcement"), ("media_portal", "change_announcement"), ("media_portal", "view_announcement"),
 ]
 
 

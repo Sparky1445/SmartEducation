@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load ui dashboard_tags %}
+{% block title %}Results · {{ quiz.title }}{% endblock %}
+{% block lede %}How students did on this quiz, and which questions they found hardest.{% endblock %}
+{% block content %}
+<div class="stack">
+  <div class="stats">
+    {% stat_card "Attempts" agg.tries %}
+    {% stat_card "Students" agg.students %}
+    {% if agg.avg is not None %}{% stat_card "Average score" agg.avg|floatformat:1 unit=out_of accent=True %}{% else %}{% stat_card "Average score" "—" %}{% endif %}
+  </div>
+</div>
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Latest attempts" "" %}
+      <ol class="qlist">{% for a in latest %}<li><span>{{ a.user.get_full_name|default:a.user.username }}</span><span class="qlist__meta">{{ a.score }} / {{ a.total }} · {{ a.created_at|date:"d M" }}</span></li>{% empty %}<li class="muted small">No attempts yet.</li>{% endfor %}</ol>
+    </section>
+  </aside>
+  <div class="split__main">
+    {% section_head "Hardest questions" "first attempts" %}
+    <ol class="gaps">
+      {% for r in rows %}
+      <li><div class="gaps__row"><span class="gaps__q">{{ r.q|truncatechars:90 }}</span><span class="gaps__bar"><span style="width: {{ r.right_pct }}%"></span></span><span class="label">{{ r.right_pct }}% right</span></div></li>
+      {% empty %}<li class="muted small">No attempts yet.</li>{% endfor %}
+    </ol>
+  </div>
+</div>
+{% endblock %}

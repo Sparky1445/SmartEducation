@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Your result{% endblock %}
+{% block lede %}{{ a.quiz.title }}{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      <p class="score {% if a.passed %}score--pass{% endif %}">{{ a.score }}<span>/{{ a.total }}</span></p>
+      <p>{% if a.passed %}Passed. Well done.{% else %}You need {{ pass_mark }}% to pass. Read the explanations and try again.{% endif %}</p>
+      <div class="actions">
+        <a class="btn btn--primary" href="{{ a.quiz.get_absolute_url }}">Try again</a>
+        {% if a.quiz.topic %}<a class="btn btn--quiet" href="{{ a.quiz.topic.get_absolute_url }}">Back to the topic</a>{% endif %}
+        <a class="btn btn--quiet" href="{% url 'courses:progress' %}">My progress</a>
+      </div>
+    </section>
+    {% if history|length > 1 %}
+    <section>
+      {% section_head "Your attempts" "" %}
+      <ol class="qlist">{% for h in history %}<li><span>{{ h.score }} / {{ h.total }}</span><span class="qlist__meta">{{ h.created_at|date:"d M, H:i" }}</span></li>{% endfor %}</ol>
+    </section>
+    {% endif %}
+  </aside>
+  <div class="split__main">
+    {% section_head "Answers" "" %}
+    <ol class="quiz">
+      {% for r in review %}
+      <li class="quiz__q is-done">
+        <p class="quiz__text">{{ r.q.q }}</p>
+        <div class="quiz__options">
+          {% for opt in r.q.options %}
+            <span class="quiz__opt {% if forloop.counter0 == r.q.answer %}is-right{% elif forloop.counter0 == r.chosen %}is-wrong{% endif %}">{{ opt }}</span>
+          {% endfor %}
+        </div>
+        {% if r.q.why %}<p class="quiz__why">{{ r.q.why }}</p>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</div>
+{% endblock %}

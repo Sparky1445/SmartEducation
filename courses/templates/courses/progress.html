@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load ui dashboard_tags %}
+{% block title %}My progress{% endblock %}
+{% block lede %}Your best score on every quiz you've taken.{% endblock %}
+{% block content %}
+<div class="stack">
+  {% section_head "Quizzes" "" %}
+  <table class="ledger">
+    <thead><tr><th>Quiz</th><th class="num">Best</th><th class="num">Tries</th><th></th></tr></thead>
+    <tbody>
+    {% for q in per_quiz %}
+      <tr><td><a href="{% url 'courses:quiz' q.quiz %}">{{ q.quiz__title }}</a></td><td class="num">{{ q.best }} / {{ q.total }}</td><td class="num">{{ q.tries }}</td>
+        <td style="width: 30%"><span class="progressbar"><span style="width: {{ q.best|percent_of:q.total }}%"></span></span></td></tr>
+    {% empty %}<tr><td colspan="4" class="ledger__empty">No quizzes yet. <a href="{% url 'courses:overview' %}">Find one in the syllabus</a>.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

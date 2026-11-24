@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     "dashboard",
     "repository",
     "accounts",
-    # --- Suhaib (add as each app lands) ---
+    "media_portal",
+    "courses",
     # "media_portal",
     # "courses",
 ]
@@ -68,6 +69,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.preferences",
+                "media_portal.context_processors.announcements",
             ],
         },
     },

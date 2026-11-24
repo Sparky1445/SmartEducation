@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}{{ quiz.title }}{% endblock %}
+{% block lede %}{{ quiz.size }} questions. Choose one answer for each, then submit to see your score and the explanations.{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Quiz" "" %}
+      <dl class="kv">
+        <dt>Questions</dt><dd>{{ quiz.size }}</dd>
+        {% if quiz.topic %}<dt>Topic</dt><dd><a href="{{ quiz.topic.get_absolute_url }}">{{ quiz.topic }}</a></dd>{% endif %}
+        {% if best %}<dt>Your best</dt><dd class="mono">{{ best.score }} / {{ best.total }}</dd>{% endif %}
+      </dl>
+      {% if not user.is_authenticated %}<p class="note"><a href="{% url 'login' %}?next={{ request.path|urlencode }}">Log in</a> to save your score.</p>{% endif %}
+    </section>
+  </aside>
+  <div class="split__main">
+    <form method="post" class="quizform" novalidate>
+      {% csrf_token %}
+      <ol class="quiz">
+        {% for field in form %}
+        <li class="quiz__q">
+          <p class="quiz__text">{{ field.label }}</p>
+          <div class="quiz__options">
+            {% for radio in field %}<label class="quiz__opt quiz__opt--radio">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}
+          </div>
+          {% for e in field.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+        </li>
+        {% endfor %}
+      </ol>
+      <button type="submit" class="btn btn--primary" style="margin-top: 20px;">Submit answers</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

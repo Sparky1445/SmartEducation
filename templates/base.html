@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/smartedu.css' %}">
   {% block head %}{% endblock %}
+  <link rel="alternate" type="application/rss+xml" title="Smart Education news" href="/news/feed/">
 </head>
 <body>
 <div class="page">
@@ -19,8 +20,8 @@
       <p class="masthead__lede">{% block lede %}A knowledge repository and outreach portal for students, teachers and the community.{% endblock %}</p>
     </div>
     <div class="masthead__meta">
-      <div>repository · outreach · media</div>
-      <div>learn · ask · share</div>
+      <div>repository · courses · news</div>
+      <div>learn · ask · events</div>
     </div>
   </header>
 
@@ -28,9 +29,11 @@
   <nav class="nav" aria-label="Main">
     {% with section=request.resolver_match.app_name %}
     <a href="{% url 'repository:list' %}" class="{% if section == 'repository' %}is-active{% endif %}">Repository</a>
+    <a href="{% url 'courses:overview' %}" class="{% if section == 'courses' %}is-active{% endif %}">Courses</a>
     <a href="{% url 'ask:home' %}" class="{% if section == 'ask' %}is-active{% endif %}">Ask</a>
     <a href="{% url 'outreach_studio:learn' %}" class="{% if request.resolver_match.url_name == 'learn' or request.resolver_match.url_name == 'learn_kit' %}is-active{% endif %}">Learn</a>
-    <span class="is-soon" title="Coming soon">Media</span>
+    <a href="{% url 'media_portal:news' %}" class="{% if section == 'media_portal' and 'news' in request.path %}is-active{% endif %}">News</a>
+    <a href="{% url 'media_portal:events' %}" class="{% if section == 'media_portal' and 'events' in request.path %}is-active{% endif %}">Events</a>
     <span class="nav__spacer"></span>
     {% if user.is_authenticated %}<a href="{% url 'dashboard:home' %}" class="{% if section == 'dashboard' %}is-active{% endif %}">Dashboard</a>{% endif %}
     {% if perms.outreach_studio.add_outreachkit %}<a href="{% url 'outreach_studio:studio' %}" class="{% if section == 'outreach_studio' and 'studio' in request.path %}is-active{% endif %}">Studio</a>{% endif %}
@@ -45,6 +48,13 @@
     {% endwith %}
   </nav>
   {% endblock %}
+
+  {% for n in announcements %}
+  <div class="banner banner--{{ n.level }}" role="status">
+    <span>{% if n.link %}<a href="{{ n.link }}">{{ n.text }}</a>{% else %}{{ n.text }}{% endif %}</span>
+    <form method="post" action="{% url 'media_portal:hide_announcement' n.pk %}" class="nav__form">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="linkbtn" aria-label="Hide this announcement">Hide</button></form>
+  </div>
+  {% endfor %}
 
   {% if messages %}
   <ul class="flash">

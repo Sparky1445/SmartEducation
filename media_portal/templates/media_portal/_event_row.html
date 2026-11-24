@@ -1,0 +1,7 @@
+<li class="eventrow">
+  <span class="eventrow__date"><span class="eventrow__day">{{ e.starts_at|date:"d" }}</span><span class="eventrow__month">{{ e.starts_at|date:"M" }}</span></span>
+  <span>
+    <a href="{{ e.get_absolute_url }}" class="eventrow__title">{{ e.title }}</a>
+    <span class="qlist__meta">{{ e.get_kind_display }} · {{ e.starts_at|date:"D, H:i" }}{% if e.venue %} · {{ e.venue }}{% endif %}</span>
+  </span>
+</li>

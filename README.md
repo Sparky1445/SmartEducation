@@ -1,7 +1,7 @@
 # Smart Education
 
 A Django knowledge repository and outreach/media portal with an agentic AI engine (INT253, 2026–27).
-Team: Atharwa (AI engine, `ask`, `outreach_studio`, `engagement`, `dashboard`, `repository`, `accounts`) · Suhaib (`media_portal`, `courses`).
+Team: Atharwa (AI engine, `ask`, `outreach_studio`, `engagement`, `dashboard`, `repository`, `accounts`, `media_portal`, `courses`).
 
 ## Run it (Windows)
 
@@ -16,7 +16,7 @@ python manage.py setup_roles      # creates the "Teacher" group
 python manage.py runserver
 ```
 
-Open http://127.0.0.1:8000/ and http://127.0.0.1:8000/admin/.
+Open http://127.0.0.1:8000/ (home page) and http://127.0.0.1:8000/admin/.
 
 The AI engine has no public pages and shows no agent activity on the site. Check it from the terminal; staff can see run records in the admin under *AI engine*:
 
@@ -137,3 +137,31 @@ Ten subjects are created by a migration; add more in the admin.
 | `/accounts/password_change/`, `/accounts/password_reset/` | Django's password views, styled. Reset emails print in the terminal unless `EMAIL_*` is set in `.env` |
 
 Every user gets a `Profile` automatically (signal); a migration creates one for users that already existed.
+
+## News, events and announcements (Module 7)
+
+| URL | What |
+| --- | --- |
+| `/` | Home page: announcements, Ask box, lead story, news, upcoming events, new lessons, revision kits, newsletter |
+| `/news/`, `/news/<year>/`, `/news/<year>/<slug>/` | News by section and year (regex URLs); drafts and scheduled stories stay hidden; teachers can preview |
+| `/news/feed/` | RSS feed (`django.contrib.syndication`) |
+| `/events/`, `/events/<id>-<slug>/`, `/events/<id>/calendar.ics` | Upcoming and past events; "Add to calendar" downloads an iCalendar file |
+
+Teachers write news, events and announcements in the admin (the Teacher group can, after `setup_roles`).
+In Outreach Studio, **Send article to News** turns a kit's approved article into a draft news story.
+Announcements show as a banner on every page until they expire; visitors can hide one.
+
+## Courses and quizzes (Module 8)
+
+| URL | What |
+| --- | --- |
+| `/courses/?grade=7` | Subjects with a syllabus for a class (defaults to the student's class), with each student's progress |
+| `/courses/class/<grade>/<subject>/` | Units and topics; a tick marks topics whose quiz the student has passed |
+| `/courses/topic/<id>-<slug>/` | Learning objectives, linked lessons, quizzes, previous/next topic |
+| `/courses/quiz/<id>/` | Scored quiz (a form built from the questions); results at `/courses/result/<id>/` with explanations |
+| `/courses/progress/` | A student's best score per quiz |
+| `/courses/quiz/<id>/report/` | Teachers: attempts, average score and the hardest questions |
+
+Teachers add units and topics in the admin (Unit page has topics inline; link lessons to a topic there).
+In Outreach Studio, **Make scored quiz** turns a kit's approved quiz into a scored quiz, optionally for a topic;
+the Learn page then shows **Take the scored quiz**. Pass mark: 60 %.

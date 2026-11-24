@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Events{% endblock %}
+{% block lede %}Exams, meetings, celebrations and holidays. Add any of them to your phone's calendar.{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Past events" "" %}
+      {% if past %}<ul class="events">{% for e in past %}{% include "media_portal/_event_row.html" %}{% endfor %}</ul>{% else %}<p class="muted small">Nothing yet.</p>{% endif %}
+    </section>
+  </aside>
+  <div class="split__main">
+    <section>
+      {% section_head "Coming up" upcoming|length|stringformat:"d"|add:" events" %}
+      {% if upcoming %}
+        <ul class="events events--big">
+          {% for e in upcoming %}
+          <li class="eventrow">
+            <span class="eventrow__date"><span class="eventrow__day">{{ e.starts_at|date:"d" }}</span><span class="eventrow__month">{{ e.starts_at|date:"M" }}</span></span>
+            <span>
+              <a href="{{ e.get_absolute_url }}" class="eventrow__title">{{ e.title }}</a>
+              <span class="qlist__meta">{{ e.get_kind_display }} · {{ e.starts_at|date:"l, H:i" }}{% if e.venue %} · {{ e.venue }}{% endif %}</span>
+              {% if e.description %}<p class="newsrow__text">{{ e.description|truncatechars:180 }}</p>{% endif %}
+            </span>
+            <a class="btn btn--quiet" href="{% url 'media_portal:event_ics' e.pk %}">Add to calendar</a>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}<p class="muted">No upcoming events.</p>{% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -464,3 +464,50 @@ fieldset.field legend { margin-bottom: 8px; }
 .seg--radio input:checked + span { background: var(--ink); color: var(--paper); }
 .seg--radio input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: -2px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- News, events, home ---------- */
+.banner { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 14px; padding: 10px 14px; background: var(--panel); border-left: 2px solid var(--ink); font-size: 13.5px; }
+.banner--important { border-left-color: var(--accent); background: var(--accent-wash); color: var(--accent-deep); }
+.banner a { color: inherit; text-decoration: underline; }
+.home-ask { margin-top: 34px; padding-bottom: 30px; border-bottom: 1px solid var(--rule); }
+.home-ask .field-input { font-size: 17px; padding: 16px 18px; }
+.lead { padding-bottom: 8px; }
+.lead__img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; margin: 12px 0 4px; }
+.lead__title { font-family: var(--serif); font-weight: 400; font-size: 44px; line-height: 1.02; margin: 12px 0 10px; max-width: 22ch; }
+.lead__title a { color: var(--ink); }
+.lead__title a:hover { color: var(--accent); text-decoration: none; }
+.newslist, .events { list-style: none; margin: 0; padding: 0; }
+.newsrow { padding: 13px 0; border-bottom: 1px solid var(--rule); }
+.newsrow__title { font-family: var(--serif); font-size: 23px; line-height: 1.1; color: var(--ink); }
+.newsrow__title:hover { color: var(--accent); text-decoration: none; }
+.newsrow__text { margin: 5px 0 4px; font-size: 13.5px; color: var(--ink-soft); }
+.eventrow { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: start; padding: 11px 0; border-bottom: 1px solid var(--rule); }
+.events--big .eventrow { grid-template-columns: 64px 1fr auto; padding: 16px 0; }
+.eventrow__date { display: flex; flex-direction: column; align-items: center; border: 1px solid var(--ink); padding: 4px 0 5px; }
+.eventrow__day { font-family: var(--serif); font-size: 24px; line-height: 1; }
+.eventrow__month { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.eventrow__title { display: block; font-weight: 500; color: var(--ink); }
+.eventrow__title:hover { color: var(--accent); }
+.figure { margin: 18px 0; }
+.figure img { display: block; width: 100%; }
+.figure figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+@media (max-width: 960px) { .events--big .eventrow { grid-template-columns: 52px 1fr; } .events--big .eventrow .btn { grid-column: 2; justify-self: start; } .lead__title { font-size: 34px; } }
+
+/* ---------- Courses ---------- */
+.progressbar { display: block; height: 4px; background: var(--rule); }
+.progressbar span { display: block; height: 100%; background: var(--accent); }
+.topics { list-style: none; margin: 0; padding: 0; counter-reset: tp; }
+.topics li { counter-increment: tp; display: grid; grid-template-columns: 30px 1fr; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.topics li::before { content: counter(tp); grid-row: span 2; font-family: var(--serif); font-size: 20px; color: var(--faint); line-height: 1.1; }
+.topics li.is-done::before { content: "✓"; color: var(--accent); }
+.topics__title { color: var(--ink); font-weight: 500; }
+.topics__title:hover { color: var(--accent); }
+.qlist li.is-current a { color: var(--accent); }
+.quiz__opt--radio { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.quiz__opt--radio input { accent-color: var(--accent); margin: 0; }
+.quiz__opt--radio:has(input:checked) { border-color: var(--ink); background: var(--panel); }
+.score { font-family: var(--serif); font-size: 86px; line-height: 1; margin: 0 0 8px; color: var(--ink); }
+.score span { font-size: 36px; color: var(--muted); }
+.score--pass { color: var(--accent); }
+.gaps__q { font-size: 14px; }
+.report .gaps__row, .gaps__row:has(.gaps__q) { grid-template-columns: minmax(0, 1.3fr) 1fr auto; }

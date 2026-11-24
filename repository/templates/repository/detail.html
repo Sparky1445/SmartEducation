@@ -17,6 +17,7 @@
         <dt>Views</dt><dd class="mono">{{ r.views|intcomma }}</dd>
       </dl>
       {% if r.tags.all %}<div class="chips">{% for t in r.tags.all %}<a class="chip" href="{% url 'repository:list' %}?tag={{ t.slug }}">{{ t.name }}</a>{% endfor %}</div>{% endif %}
+      {% if r.topics.all %}<p class="small" style="margin-top: 12px;">Syllabus: {% for t in r.topics.all %}<a href="{{ t.get_absolute_url }}">{{ t.title }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
       {% rating_for r %}
     </section>
     <section class="actions">

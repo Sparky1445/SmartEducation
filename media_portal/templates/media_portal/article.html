@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load ui engagement_tags %}
+{% block title %}{{ a.title }}{% endblock %}
+{% block lede %}{{ a.get_category_display }} · {{ a.published_at|date:"d F Y" }}{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Story" "" %}
+      <dl class="kv">
+        <dt>Section</dt><dd><a href="{% url 'media_portal:news' %}?category={{ a.category }}">{{ a.get_category_display }}</a></dd>
+        <dt>Published</dt><dd class="mono">{{ a.published_at|date:"d M Y, H:i" }}</dd>
+        {% if a.author %}<dt>By</dt><dd>{{ a.author.get_full_name|default:a.author.username }}</dd>{% endif %}
+        <dt>Reading</dt><dd>{{ a.reading_minutes }} min</dd>
+      </dl>
+      {% if a.source_kit and a.source_kit.status == "published" %}<p class="note">This story comes from a lesson. <a href="{{ a.source_kit.get_absolute_url }}">Revise it with key points and a quiz</a>.</p>{% endif %}
+      {% if a.status != "published" %}<p class="note note--error">Preview: this article is not published yet.</p>{% endif %}
+    </section>
+    {% if more %}
+    <section>
+      {% section_head "More like this" "" %}
+      <ul class="newslist">{% for a in more %}{% include "media_portal/_article_row.html" %}{% endfor %}</ul>
+    </section>
+    {% endif %}
+  </aside>
+  <div class="split__main">
+    <article>
+      <h2 class="article__headline">{{ a.title }}</h2>
+      {% if a.standfirst %}<p class="article__standfirst">{{ a.standfirst }}</p>{% endif %}
+      {% if a.cover %}<figure class="figure"><img src="{{ a.cover.url }}" alt="{{ a.cover_caption|default:a.title }}">{% if a.cover_caption %}<figcaption>{{ a.cover_caption }}</figcaption>{% endif %}</figure>{% endif %}
+      <div class="article__body">{% for p in a.paragraphs %}<p>{{ p|urlize }}</p>{% endfor %}</div>
+    </article>
+    {% if a.status == "published" %}{% comments_for a %}{% endif %}
+  </div>
+</div>
+{% endblock %}

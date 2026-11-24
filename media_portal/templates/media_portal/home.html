@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Home{% endblock %}
+{% block lede %}The school's shared library and notice board. Find a lesson, ask about it, and keep up with what's happening at school.{% endblock %}
+
+{% block content %}
+<div class="home-ask">
+  <form method="post" action="{% url 'ask:home' %}" class="field">
+    {% csrf_token %}
+    <label for="home-question" class="label">Ask the repository</label>
+    <div class="field__row">
+      <input id="home-question" type="text" name="question" class="field-input" placeholder="What causes the seasons on Earth?" maxlength="500" required>
+      <button type="submit" class="btn btn--primary btn--run">Ask</button>
+    </div>
+  </form>
+</div>
+
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Coming up" "" %}
+      {% if events %}
+        <ul class="events">{% for e in events %}{% include "media_portal/_event_row.html" %}{% endfor %}</ul>
+      {% else %}<p class="muted small">No events in the calendar right now.</p>{% endif %}
+      <p class="small" style="margin-top: 10px;"><a href="{% url 'media_portal:events' %}">All events</a></p>
+    </section>
+
+    <section>
+      {% section_head "Newsletter" "" %}
+      <form method="post" action="{% url 'engagement:newsletter' %}" class="stack-form">
+        {% csrf_token %}
+        {{ newsletter_form.email }}
+        <div class="hp" aria-hidden="true">{{ newsletter_form.website }}</div>
+        <input type="hidden" name="language" value="{{ pref_lang }}">
+        <label class="check"><input type="checkbox" name="consent" required> <span>Email me when new lessons go live.</span></label>
+        <button type="submit" class="btn">Subscribe</button>
+      </form>
+    </section>
+  </aside>
+
+  <div class="split__main">
+    {% if lead %}
+    <section class="lead">
+      <span class="label label--accent">{{ lead.get_category_display }} · {{ lead.published_at|date:"d M Y" }}</span>
+      {% if lead.cover %}<a href="{{ lead.get_absolute_url }}"><img class="lead__img" src="{{ lead.cover.url }}" alt="{{ lead.cover_caption|default:lead.title }}"></a>{% endif %}
+      <h2 class="lead__title"><a href="{{ lead.get_absolute_url }}">{{ lead.title }}</a></h2>
+      {% if lead.standfirst %}<p class="article__standfirst">{{ lead.standfirst }}</p>{% endif %}
+    </section>
+    {% endif %}
+
+    {% if news %}
+    <section>
+      {% section_head "News" "" %}
+      <ul class="newslist">{% for a in news %}{% include "media_portal/_article_row.html" %}{% endfor %}</ul>
+      <p class="small" style="margin-top: 10px;"><a href="{% url 'media_portal:news' %}">All news</a></p>
+    </section>
+    {% endif %}
+
+    <section>
+      {% section_head "New in the repository" "" %}
+      {% if lessons %}
+        <div class="tiles tiles--compact">{% for r in lessons %}{% include "repository/_card.html" %}{% endfor %}</div>
+      {% else %}<p class="muted small">No lessons yet.</p>{% endif %}
+      <p class="small" style="margin-top: 10px;"><a href="{% url 'repository:list' %}">Browse all lessons</a></p>
+    </section>
+
+    {% if kits %}
+    <section>
+      {% section_head "Revise" "key points and quizzes" %}
+      <ol class="qlist">{% for k in kits %}<li><a href="{{ k.get_absolute_url }}">{{ k.title }}</a><span class="qlist__meta">published {{ k.published_at|date:"d M" }}</span></li>{% endfor %}</ol>
+    </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

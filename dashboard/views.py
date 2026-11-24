@@ -10,6 +10,8 @@ from django.views.generic import TemplateView
 
 from ai_engine import services
 from ask.models import ChatQuery
+from courses.models import QuizAttempt
+from courses.views import class_quiz_summary
 from repository.models import Bookmark, Resource
 from engagement.models import Comment, Feedback, NewsletterSubscriber
 from outreach_studio.models import OutreachKit
@@ -45,6 +47,7 @@ class StudentDashboardView(LoginRequiredMixin, TemplateView):
         ctx.update(
             {
                 "class_label": f"For class {grade}" if grade else "",
+                "attempts": QuizAttempt.objects.filter(user=user).select_related("quiz")[:5],
                 "questions": mine[:6],
                 "asked": agg["total"],
                 "found_pct": round(100 * agg["found"] / agg["total"]) if agg["total"] else 0,
@@ -79,6 +82,7 @@ class TeacherDashboardView(LoginRequiredMixin, PermissionRequiredMixin, Template
                 "community": stats.community(),
                 "feedback": Feedback.objects.filter(resolved=False)[:5],
                 "latest_comments": Comment.objects.select_related("user", "content_type")[:5],
+                "quiz_summary": class_quiz_summary(),
             }
         )
         return ctx

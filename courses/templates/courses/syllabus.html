@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}{{ subject }} · Class {{ grade }}{% endblock %}
+{% block lede %}{{ subject }} for class {{ grade }}: every unit and topic, with lessons and a quiz to check yourself.{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "Units" "" %}
+      <ol class="qlist">{% for u in units %}<li><a href="#unit-{{ u.number }}">{{ u.title }}</a><span class="qlist__meta">unit {{ u.number }} · {{ u.topics.all|length }} topics</span></li>{% endfor %}</ol>
+    </section>
+    <a class="btn btn--quiet" href="{% url 'courses:overview' %}?grade={{ grade }}">&larr; All subjects</a>
+  </aside>
+  <div class="split__main">
+    {% for u in units %}
+    <section id="unit-{{ u.number }}">
+      <div class="section-head"><h2>{{ u.title }}</h2><span class="section-head__meta">unit {{ u.number }}</span></div>
+      {% if u.description %}<p class="muted small" style="margin-top: 0;">{{ u.description }}</p>{% endif %}
+      <ol class="topics">
+        {% for t in u.topics.all %}
+        <li class="{% if t.pk in done %}is-done{% endif %}">
+          <a href="{{ t.get_absolute_url }}" class="topics__title">{{ t.title }}</a>
+          <span class="qlist__meta">{{ t.n_lessons }} lesson{{ t.n_lessons|pluralize }}{% if t.n_quizzes %} · quiz{% endif %}{% if t.pk in done %} · done{% endif %}</span>
+        </li>
+        {% empty %}<li class="muted small">Topics coming soon.</li>{% endfor %}
+      </ol>
+    </section>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -68,6 +68,18 @@
     </section>
 
     <section>
+      {% section_head "Quiz results" "most attempted" %}
+      <table class="ledger">
+        <thead><tr><th>Quiz</th><th class="num">Attempts</th><th class="num">Average</th></tr></thead>
+        <tbody>
+        {% for q in quiz_summary %}
+          <tr><td><a href="{% url 'courses:report' q.pk %}">{{ q.title }}</a></td><td class="num">{{ q.tries }}</td><td class="num">{{ q.avg|floatformat:1 }} / {{ q.size }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="ledger__empty">No quiz attempts yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section>
       {% section_head "Best-rated lessons" "" %}
       <table class="ledger">
         <thead><tr><th>Lesson</th><th class="num">Rating</th><th class="num">Votes</th></tr></thead>

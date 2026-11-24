@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}{{ e.title }}{% endblock %}
+{% block lede %}{{ e.get_kind_display }} · {{ e.starts_at|date:"l, d F Y" }}{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "When and where" "" %}
+      <dl class="kv">
+        <dt>Starts</dt><dd>{{ e.starts_at|date:"D d M Y, H:i" }}</dd>
+        {% if e.ends_at %}<dt>Ends</dt><dd>{{ e.ends_at|date:"D d M Y, H:i" }}</dd>{% endif %}
+        {% if e.venue %}<dt>Venue</dt><dd>{{ e.venue }}</dd>{% endif %}
+      </dl>
+    </section>
+    <section class="actions">
+      {% if not e.is_past %}<a class="btn btn--primary" href="{% url 'media_portal:event_ics' e.pk %}">Add to calendar</a>{% endif %}
+      <a class="btn btn--quiet" href="{% url 'media_portal:events' %}">All events</a>
+    </section>
+  </aside>
+  <div class="split__main">
+    <h2 class="article__headline">{{ e.title }}</h2>
+    {% if e.is_past %}<p class="note">This event has already taken place.</p>{% endif %}
+    <div class="article__body">{{ e.description|linebreaks }}</div>
+  </div>
+</div>
+{% endblock %}

@@ -20,6 +20,7 @@
         <div class="match__row"><span class="label">Your quiz score</span><span class="label label--accent" data-quiz-score>not started</span></div>
       </div>
       {% endif %}
+      {% if scored_quiz %}<a class="btn btn--primary" href="{{ scored_quiz.get_absolute_url }}">Take the scored quiz</a>{% endif %}
       {% rating_for kit %}
       <p class="small muted">Published {{ kit.published_at|date:"d F Y" }}. Prepared from material uploaded by our teachers and checked before publishing.</p>
     </section>

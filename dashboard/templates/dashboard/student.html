@@ -74,6 +74,14 @@
     </section>
 
     <section>
+      {% section_head "Quiz scores" "" %}
+      {% if attempts %}
+        <ol class="qlist">{% for a in attempts %}<li><a href="{% url 'courses:result' a.pk %}">{{ a.quiz.title }}</a><span class="qlist__meta">{{ a.score }} / {{ a.total }}{% if a.passed %} · passed{% endif %} · {{ a.created_at|date:"d M" }}</span></li>{% endfor %}</ol>
+        <p class="small" style="margin-top: 10px;"><a href="{% url 'courses:progress' %}">All my progress</a></p>
+      {% else %}<p class="muted small">Take a quiz from the <a href="{% url 'courses:overview' %}">syllabus</a> and your scores appear here.</p>{% endif %}
+    </section>
+
+    <section>
       {% section_head "My questions" "" %}
       <table class="ledger">
         <thead><tr><th>Question</th><th>Result</th><th class="num">Asked</th></tr></thead>

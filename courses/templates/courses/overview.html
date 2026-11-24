@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load ui dashboard_tags %}
+{% block title %}Courses{% endblock %}
+{% block lede %}The syllabus for each class, unit by unit, with the lessons and quizzes for every topic.{% endblock %}
+{% block content %}
+<div class="stack">
+  <nav class="filters">{% for g, label in grades %}<a href="?grade={{ g }}" class="{% if g == grade %}is-active{% endif %}">{{ label }}</a>{% endfor %}</nav>
+  <div class="section-head"><h2>Class {{ grade }}</h2><span class="section-head__meta">subjects</span></div>
+</div>
+{% if rows %}
+<div class="tiles">
+  {% for row in rows %}
+  <a class="tile" href="{% url 'courses:syllabus' grade row.subject.slug %}">
+    <span class="label label--accent">{{ row.subject.n_units }} unit{{ row.subject.n_units|pluralize }} · {{ row.total }} topic{{ row.total|pluralize }}</span>
+    <span class="tile__title">{{ row.subject.name }}</span>
+    {% if user.is_authenticated %}
+      <span class="tile__text">{{ row.done }} of {{ row.total }} topics done</span>
+      <span class="progressbar"><span style="width: {{ row.done|percent_of:row.total }}%"></span></span>
+    {% else %}<span class="tile__text"></span>{% endif %}
+    <span class="tile__meta">open syllabus</span>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+  <p class="muted">No syllabus for this class yet. Teachers add units and topics in the admin.</p>
+{% endif %}
+{% endblock %}

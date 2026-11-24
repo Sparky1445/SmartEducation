@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}{{ topic.title }}{% endblock %}
+{% block lede %}{{ topic.unit.subject }} · Class {{ topic.unit.grade }} · Unit {{ topic.unit.number }}: {{ topic.unit.title }}{% endblock %}
+{% block content %}
+<div class="split">
+  <aside class="split__aside">
+    <section>
+      {% section_head "In this unit" "" %}
+      <ol class="qlist">{% for t in topic.unit.topics.all %}<li class="{% if t == topic %}is-current{% endif %}"><a href="{{ t.get_absolute_url }}">{{ t.title }}</a></li>{% endfor %}</ol>
+    </section>
+    <a class="btn btn--quiet" href="{{ topic.unit.get_absolute_url }}">&larr; Syllabus</a>
+  </aside>
+  <div class="split__main">
+    <section>
+      <h2 class="article__headline">{{ topic.title }}</h2>
+      {% if is_done %}<p class="note">You've passed the quiz for this topic.</p>{% endif %}
+      {% if topic.objective_list %}
+        {% section_head "By the end you can" "" %}
+        <ul class="points">{% for o in topic.objective_list %}<li>{{ o }}</li>{% endfor %}</ul>
+      {% endif %}
+    </section>
+    <section>
+      {% section_head "Lessons" "" %}
+      {% if lessons %}<div class="tiles tiles--compact">{% for r in lessons %}{% include "repository/_card.html" %}{% endfor %}</div>
+      {% else %}<p class="muted small">No lessons linked yet.</p>{% endif %}
+    </section>
+    <section>
+      {% section_head "Check yourself" "" %}
+      {% if quizzes %}
+        <ol class="qlist">{% for q in quizzes %}<li><a href="{{ q.get_absolute_url }}">{{ q.title }}</a><span class="qlist__meta">{{ q.size }} questions{% if perms.courses.view_quizattempt %} · <a href="{% url 'courses:report' q.pk %}">results</a>{% endif %}</span></li>{% endfor %}</ol>
+      {% else %}<p class="muted small">No quiz yet. <a href="{% url 'ask:home' %}">Ask a question</a> about this topic instead.</p>{% endif %}
+    </section>
+    <nav class="filters">
+      {% if prev %}<a href="{{ prev.get_absolute_url }}">&larr; {{ prev.title }}</a>{% endif %}
+      {% if next %}<a href="{{ next.get_absolute_url }}">{{ next.title }} &rarr;</a>{% endif %}
+    </nav>
+  </div>
+</div>
+{% endblock %}
