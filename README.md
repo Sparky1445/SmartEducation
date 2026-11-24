@@ -165,3 +165,23 @@ Announcements show as a banner on every page until they expire; visitors can hid
 Teachers add units and topics in the admin (Unit page has topics inline; link lessons to a topic there).
 In Outreach Studio, **Make scored quiz** turns a kit's approved quiz into a scored quiz, optionally for a topic;
 the Learn page then shows **Take the scored quiz**. Pass mark: 60 %.
+
+## Demo data (Module 9)
+
+```bash
+python manage.py seed_demo              # lessons, syllabus, news, events, users, activity + one AI outreach kit
+python manage.py seed_demo --skip-kits  # same, without any AI calls
+```
+
+Safe to run more than once. Demo logins, all with password `smartedu-demo-26`:
+
+| Username | Role |
+| --- | --- |
+| `teacher` | Teacher group and staff: upload, Studio, news, quiz reports, admin |
+| `student` | Class 7 student with quiz attempts, questions and a comment |
+| `parent` | Parent, newsletter subscriber |
+
+It adds 6 lessons (5 readable notes + 1 YouTube video, all searchable on Ask), 6 units with
+12 topics, 2 scored quizzes, 4 news stories, 4 events, an announcement, questions for the gap radar, comments,
+ratings and feedback. With an AI provider set, it also writes, approves and publishes an outreach kit
+for "The water cycle".

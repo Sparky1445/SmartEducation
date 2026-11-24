@@ -20,6 +20,7 @@ from outreach_studio.models import OutreachKit
 GAP_STOPWORDS = {
     "difference", "between", "work", "mean", "example", "simple", "word", "happen", "make", "made", "use",
     "type", "kind", "form", "cause", "caus", "thing", "way", "important", "different", "doe", "does",
+    "built", "build", "who", "measured", "measure",
 }
 
 
@@ -133,16 +134,20 @@ def kit_counts() -> dict:
     return dict(OutreachKit.objects.values_list("status").annotate(n=Count("id")))
 
 
-def top_rated_kits(limit: int = 5) -> list[dict]:
-    ct = ContentType.objects.get_for_model(OutreachKit)
+def top_rated(limit: int = 5) -> list[dict]:
+    """Best-rated lessons and kits together: [{"obj", "avg", "n"}]."""
     rows = (
-        Rating.objects.filter(content_type=ct)
-        .values("object_id")
+        Rating.objects.values("content_type", "object_id")
         .annotate(avg=Avg("stars"), n=Count("id"))
         .order_by("-avg", "-n")[:limit]
     )
-    kits = OutreachKit.objects.in_bulk([r["object_id"] for r in rows])
-    return [{"kit": kits[r["object_id"]], "avg": round(r["avg"], 1), "n": r["n"]} for r in rows if r["object_id"] in kits]
+    out = []
+    for r in rows:
+        ct = ContentType.objects.get_for_id(r["content_type"])
+        obj = ct.model_class()._default_manager.filter(pk=r["object_id"]).first()
+        if obj is not None:
+            out.append({"obj": obj, "avg": round(r["avg"], 1), "n": r["n"]})
+    return out
 
 
 def community() -> dict:

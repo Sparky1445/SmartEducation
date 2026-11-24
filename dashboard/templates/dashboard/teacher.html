@@ -85,7 +85,7 @@
         <thead><tr><th>Lesson</th><th class="num">Rating</th><th class="num">Votes</th></tr></thead>
         <tbody>
         {% for row in top_kits %}
-          <tr><td><a href="{{ row.kit.get_absolute_url }}">{{ row.kit }}</a></td><td class="num">{{ row.avg }} ★</td><td class="num">{{ row.n }}</td></tr>
+          <tr><td><a href="{{ row.obj.get_absolute_url }}">{{ row.obj }}</a></td><td class="num">{{ row.avg }} ★</td><td class="num">{{ row.n }}</td></tr>
         {% empty %}<tr><td colspan="3" class="ledger__empty">No ratings yet.</td></tr>{% endfor %}
         </tbody>
       </table>

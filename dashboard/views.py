@@ -78,7 +78,7 @@ class TeacherDashboardView(LoginRequiredMixin, PermissionRequiredMixin, Template
                 "gaps": stats.gap_radar(),
                 "kits": stats.kit_counts(),
                 "to_review": OutreachKit.objects.filter(status=OutreachKit.Status.REVIEW)[:5],
-                "top_kits": stats.top_rated_kits(),
+                "top_kits": stats.top_rated(),
                 "community": stats.community(),
                 "feedback": Feedback.objects.filter(resolved=False)[:5],
                 "latest_comments": Comment.objects.select_related("user", "content_type")[:5],
